@@ -1,0 +1,53 @@
+table: resturants
+-------------------
+resturant_id
+resturant_moto
+resturant_name
+resturant_name_bn
+resturant_contact_number
+resturant_email
+resturant_logo
+resturant_name_slug
+resturant_address
+resturant_open_at
+resturant_close_at
+resturant_establish_date
+resturant_status
+resturant_condition
+
+resturant_website
+
+
+table: tags
+------------
+tag_id
+tag_name
+tag_status
+tag_created_at
+
+
+table: resturant_tag
+---------------------
+resturant_tag_id
+resturant_id
+tag_id
+resturant_tag_created_at
+
+
+
+table: ratings
+--------------
+rating_id
+rating_value
+rating_status
+rating_created_at
+
+
+table: resturant_rating
+-----------------------
+resturant_rating_id
+resturant_id
+rating_id
+resturant_rating_created_at
+
+
