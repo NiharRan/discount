@@ -1,18 +1,21 @@
 
- <div class="container-fluid">
+ <div class="container-fluid" id="restaurants_info">
     <div class="row">
         <div class="col" style="margin-top: 108px;">
             <div class="card shadow">
             <div class="card-header border-0">
-                <h3 class="mb-0"><i class="fas fa-store"></i> Resturant Lists
-                    <a href="<?php echo site_url('settings/resturants/create'); ?>" class="btn btn-sm btn-primary float-right"><i class="fas fa-plus"></i> New</a>
+                <h3 class="mb-0"><i class="fas fa-store"></i> Restaurant Lists
+                    <!-- if logged in user has permission to create new restaurant -->
+                    <?php if($this->permission->has_permission('restaurant', 'create')) { ?>
+                        <a href="<?php echo site_url('restaurants/create'); ?>" class="btn btn-sm btn-primary float-right"><i class="fas fa-plus"></i> New</a>
+                    <?php }?>
                 </h3>
             </div>
             <div class="table-responsive">
                 <table class="table align-items-center table-flush">
                 <thead class="thead-light">
                     <tr>
-                    <th scope="col">Resturant</th>
+                    <th scope="col">Restaurant</th>
                     <th scope="col">Author</th>
                     <th scope="col">Tags</th>
                     <th scope="col">Rating</th>
@@ -57,14 +60,14 @@
                     </td>
                     <td class="text-right">
                         <div class="dropdown">
-                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
+                            <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
                         </div>
                     </td>
                     </tr>

@@ -14,11 +14,20 @@ $route['register'] = 'auth/register';
 // Admin routes
 $route['/'] = 'deshboard/index';
 
-$route['settings/resturants'] = 'resturant/index';
-$route['settings/resturants/create'] = 'resturant/create';
+$route['restaurants'] = 'restaurant/index';
+$route['restaurants/create'] = 'restaurant/create';
+$route['settings/restaurant'] = 'restaurant/profile';
 
 
 $route['settings/tags'] = 'tag/index';
 $route['settings/tags/store'] = 'tag/store';
 $route['settings/tags/update'] = 'tag/update';
 $route['settings/tags/remove/(:num)'] = 'tag/delete/$1';
+
+// user routes
+$route['users'] = 'user/index';
+$route['users/types'] = 'user/usertypes';
+$route['users/create'] = 'user/create';
+$route['users/store'] = 'user/store';
+$route['users/update'] = 'user/update';
+$route['users/remove/(:num)'] = 'user/delete/$1';

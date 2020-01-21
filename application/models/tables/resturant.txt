@@ -7,6 +7,7 @@ resturant_name_bn
 resturant_contact_number
 resturant_email
 resturant_logo
+resturant_banner
 resturant_name_slug
 resturant_address
 resturant_open_at

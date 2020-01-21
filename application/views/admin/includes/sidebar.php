@@ -14,11 +14,25 @@
             <a class=" nav-link active " href="<?php echo site_url('/'); ?>"> <i class="ni ni-tv-2 text-primary"></i> <span class="nav-link-text">Dashboard</span>
               </a>
             </li>
+
+            <?php if($this->permission->has_permission('user', 'list-view')) {?>
             <li class="nav-item">
-              <a class="nav-link " href="./examples/icons.html">
-                <i class="ni ni-planet text-blue"></i> <span class="nav-link-text">Icons</span>
+              <a class="nav-link" href="<?php echo base_url(); ?>users">
+              <i class="fas fa-user text-teal"></i> Users
               </a>
             </li>
+            <?php } ?>
+
+
+            <?php if($this->permission->has_permission('restaurant', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo site_url('restaurants'); ?>">
+              <i class="fas fa-store text-teal"></i> Restaurants
+              </a>
+            </li>
+            <?php } ?>
+
+
             <li class="nav-item">
               <a class="nav-link " href="./examples/maps.html">
                 <i class="ni ni-pin-3 text-orange"></i> <span class="nav-link-text">Maps</span>
@@ -32,6 +46,7 @@
           </ul>
           <h6 class="navbar-heading text-muted">Setting</h6>
           <ul class="navbar-nav mb-md-3">
+            <!-- if user has permission to view resturant list -->
             <?php if($this->permission->has_permission('resturant', 'list-view')) {?>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>settings/resturants">
@@ -39,6 +54,17 @@
               </a>
             </li>
             <?php }?>
+
+            <!-- if user has permission to edit resturant info -->
+            <?php if($this->permission->has_permission('restaurant', 'edit')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo site_url('settings/restaurant'); ?>">
+                <i class="fas fa-store text-green"></i> Resturant
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view tag list -->
             <?php if($this->permission->has_permission('tag', 'list-view')) {?>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>settings/tags">
