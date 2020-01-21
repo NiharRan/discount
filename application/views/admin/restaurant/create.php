@@ -16,7 +16,7 @@
                                     <input type="text" v-model="formData.restaurant_moto" placeholder="Restaurant Moto" class="form-control">
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="text" v-model="formData.restaurant_name" placeholder="Restaurant Logo" class="form-control">
+                                    <input type="text" v-model="formData.restaurant_name" placeholder="Restaurant Name" class="form-control">
                                 </div>
                             </div>
 
@@ -48,7 +48,21 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-success btn-sm float-right">Create</button>
+                                <multiselect 
+                                    v-model="formData.tags" 
+                                    :height="300"
+                                    :options="tags" 
+                                    :multiple="true" 
+                                    :taggable="true"
+                                    :close-on-select="true" 
+                                    :clear-on-select="true" 
+                                    :preserve-search="true" 
+                                    placeholder="Search or add a tag"
+                                    label="tag_name" 
+                                    track-by="tag_name" 
+                                    :preselect-first="false"
+                                >
+                                </multiselect>
                                 </div>
                             </div>
                         </div>
@@ -65,6 +79,9 @@
                                     <input name="user_avatar" type="file" class="hidden" id="uploadFile"/>
                                 </label>
                             </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 text-center">
+                            <button type="submit" class="btn btn-success btn-sm">Create</button>
                         </div>
                     </div>
                 </div>

@@ -179,6 +179,33 @@ class Tag extends CI_Controller {
 		echo json_encode($jsonData);
 	}
 
+	/**
+	 * fetch all active tags by this method. 
+	 * Return taglist if table is not empty
+	 * otherwise null.
+	 *
+	 * @return	array[object] taglist
+	 */
+	function allactivetags()
+	{
+		// response object
+		$jsonData = array('success' => false, 'data' => array());
+
+		$tags = $this->tag_model->fetch_all_active_tags();
+		/**
+		 * if tags is not empty
+		 * @response object
+		 * 	 success => everything all right
+		 *   data => taglist
+		 */
+		if ($tags->num_rows() > 0) {
+			$jsonData['success'] = true;
+			$jsonData['data'] = $tags->result();
+		}
+		// responde send
+		echo json_encode($jsonData);
+	}
+
 	function paginate($obj)
 	{
 		// integrate bootstrap pagination

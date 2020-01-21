@@ -76,4 +76,16 @@ class Tag_Model extends CI_Model
         if(!empty($search)) $this->db->like('tag_name', $search);
         return $this->db->limit($limit, $start)->get();
     }
+
+    /**
+     * fetch all active tags
+     * @return taglist array
+     */
+    function fetch_all_active_tags()
+    {
+        return $this->db->select('*')
+                        ->from('tags')
+                        ->where('tag_status', 1)
+                        ->get();
+    }
 }

@@ -14,22 +14,35 @@ new Vue({
         restaurant_open_at: '',
         restaurant_close_at: '',
         restaurant_establish_date: '',
+        tags: []
     },
     bannerUrl: "url("+base_url+"uploads/default/restaurant/banner.jpg)",
     logoUrl: "url("+base_url+"uploads/default/restaurant/logo.png)",
-    options: [],
-    links: '',
-    tagStatus: [],
-    tag_status: '',
-    search: '',
+    tags: [],
     errors: {
-        tag_name: ""
+      restaurant_name: '',
+      restaurant_address: '',
+      restaurant_open_at: '',
+      restaurant_close_at: '',
+      restaurant_establish_date: '',
     },
     isloading: false,
   },
 
-  method: {
-
+  methods: {
+    fetchtags() {
+      var self = this;
+      axios
+      .get(base_url+'tag/allactivetags')
+      .then(function ({ data }) {
+        if (data.success) {
+          self.tags = data.data
+        }
+      })
+    }
+  },
+  created() {
+    this.fetchtags();
   },
   filters: {
     customDate(value) {
