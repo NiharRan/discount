@@ -33,14 +33,4 @@ class Permission
 		return $query->num_rows() > 0;
 	}
 
-	/**
-	 * Check if user logged in. Also test if user is activated or not.
-	 *
-	 * @param	bool
-	 * @return	bool
-	 */
-
 }
-
-/* End of file Tank_auth.php */
-/* Location: ./application/libraries/Tank_auth.php */

@@ -28,6 +28,7 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
   <!-- Icons -->
   <link href="<?php echo base_url(); ?>assets/js/plugins/nucleo/css/nucleo.css" rel="stylesheet" />
+  <link href="<?php echo base_url(); ?>assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
   <link href="<?php echo base_url(); ?>assets/js/plugins/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link href="<?php echo base_url(); ?>assets/css/argon-dashboard.css?v=1.1.0" rel="stylesheet" />
@@ -66,11 +67,12 @@
   <!--   Core   -->
   <script src="<?php echo base_url(); ?>assets/js/plugins/jquery/dist/jquery.min.js"></script>
   <script src="<?php echo base_url(); ?>assets/js/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo base_url(); ?>assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
   <!--   Optional JS   -->
   <script src="<?php echo base_url(); ?>assets/js/plugins/chart.js/dist/Chart.min.js"></script>
   <script src="<?php echo base_url(); ?>assets/js/plugins/chart.js/dist/Chart.extension.js"></script>
   <!--   Argon JS   -->
-  <script src="<?php echo base_url(); ?>assets/js/argon-dashboard.min.js?v=1.1.0"></script>
+  <script src="<?php echo base_url(); ?>assets/js/argon-dashboard.js"></script>
   <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
 
 
