@@ -134,6 +134,7 @@ class Restaurant extends CI_Controller {
 				'restaurant_establish_date' => date('Y-m-d', strtotime($this->input->post('restaurant_establish_date'))),
 				'restaurant_moto' => $this->input->post('restaurant_moto'),
 				'restaurant_email' => $this->input->post('restaurant_email'),
+				'restaurant_slug' => url_title($this->input->post('restaurant_name'), true),
 				'restaurant_created_at' => date('Y-m-d H:i:s'),
 				'restaurant_creator' => $this->session->userdata('user_id')
 			);
@@ -280,7 +281,7 @@ class Restaurant extends CI_Controller {
 				'tag_id' => $tags[$key],
 			);
 			// store tag through tag model
-			$this->restaurant_model->add_tags_to_restaurant($restaurantTagData);
+			$this->restaurant_model->add_tags_with_restaurant($restaurantTagData);
 		}
 	}
 

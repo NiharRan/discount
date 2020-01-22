@@ -28,13 +28,13 @@ class Restaurant_Model extends CI_Model
 	}
 	
 	/**
-	 * this method store restaurant restaurents
+	 * this method store restaurant tags
 	 * @param data object
 	 * @return boolean
 	 */
-	function add_restaurents_to_restaurant($data)
+	function add_tags_with_restaurant($data)
 	{
-		return $this->db->insert('restaurant_restaurents', $data);
+		return $this->db->insert('restaurant_tags', $data);
 	}
 	
 	/**
