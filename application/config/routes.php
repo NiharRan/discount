@@ -15,7 +15,12 @@ $route['register'] = 'auth/register';
 $route['/'] = 'deshboard/index';
 
 $route['restaurants'] = 'restaurant/index';
+$route['restaurants/all'] = 'restaurant/allrestaurants';
 $route['restaurants/create'] = 'restaurant/create';
+$route['restaurants/(:any)'] = 'restaurant/edit';
+$route['restaurant/edit/(:any)'] = 'restaurant/fetch_by_slug';
+$route['restaurants/check-permission'] = 'restaurant/has_permission_to_edit_restaurant';
+$route['restaurants/change-status'] = 'restaurant/changestatus';
 $route['settings/restaurant'] = 'restaurant/profile';
 
 

@@ -83,7 +83,7 @@ class Restaurant extends CI_Controller {
     function create()
 	{
 		if (!$this->permission->has_permission('restaurant', 'create')) {
-			redirect('/auth/login/');
+			redirect($_SERVER['HTTP_REFERER']);
 		} else {
 			$data['title'] = 'Offer.com || Restaurant List';
 			$data['user_id']	= $this->tank_auth->get_user_id();
@@ -101,8 +101,8 @@ class Restaurant extends CI_Controller {
 
 	/**
 	 * new restaurant store by this method. 
-	 * Return TRUE if restaurant info stored successfully
-	 * otherwise FALSE.
+	 * Return success TRUE if restaurant info stored successfully
+	 * otherwise success FALSE.
 	 *
 	 * @param	
 	 * @return	object
@@ -124,9 +124,9 @@ class Restaurant extends CI_Controller {
 		// if validation is done & everything is valid
 		if ($this->form_validation->run()) {
 			$jsonData['check'] = true;
-			// store user info
+			// store restaurant info
 			$restaurantData = array(
-				'restaurant_name' => $this->input->post('restaurant_name'),
+				'restaurant_moto' => $this->input->post('restaurant_moto'),
 				'restaurant_name' => $this->input->post('restaurant_name'),
 				'restaurant_address' => $this->input->post('restaurant_address'),
 				'restaurant_open_at' => date('H:i:s', strtotime($this->input->post('restaurant_open_at'))),
@@ -134,11 +134,11 @@ class Restaurant extends CI_Controller {
 				'restaurant_establish_date' => date('Y-m-d', strtotime($this->input->post('restaurant_establish_date'))),
 				'restaurant_moto' => $this->input->post('restaurant_moto'),
 				'restaurant_email' => $this->input->post('restaurant_email'),
-				'restaurant_slug' => url_title($this->input->post('restaurant_name'), true),
+				'restaurant_slug' => url_title($this->input->post('restaurant_name'), "dash", true),
 				'restaurant_created_at' => date('Y-m-d H:i:s'),
 				'restaurant_creator' => $this->session->userdata('user_id')
 			);
-			// store user through user model
+			// store restaurant through restaurant model
 			$restaurant_id = $this->restaurant_model->store($restaurantData);
 
 			if ($restaurant_id) {
@@ -213,6 +213,236 @@ class Restaurant extends CI_Controller {
 					}
 				}
 			}
+		} else {
+			foreach ($_POST as $key => $value) {
+				$jsonData['errors'][$key] = strip_tags(form_error($key));
+			}
+		}
+		
+		// send the response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * restaurant update form is load by this method 
+	 *
+	 * @param	restaurant_slug	
+	 * @return	object
+	 */
+    function edit()
+	{
+		$data['title'] = 'Offer.com || Restaurant Edit Form';
+		$data['user_id']	= $this->tank_auth->get_user_id();
+		$data['username']	= $this->tank_auth->get_username();
+		
+		// view page data
+		$data['extrastyle'] = 'inc/_vuestyle';
+		$data['extrascript'] = 'inc/_vuescript';
+		$data['vuecomponent'] = 'components/restaurant/edit';
+
+		$data['content'] = 'admin/restaurant/edit';
+		$this->load->view('layouts/master', $data);
+	}
+
+	/**
+	 * this method fetch restaurant info 
+	 * using restaurant slug
+	 * @return restaurant info
+	 */
+	function fetch_by_slug()
+	{
+		// intialize response data
+		$jsonData = array('success' => false, 'data' => '');
+
+		// get restaurant slug from url
+		$slug = $this->uri->segment(3);
+		// fetch restaurant info
+		$restaurant = $this->restaurant_model->fetch_restaurant_info_by_slug($slug);
+
+		// if restaurant info found
+		if (count($restaurant) > 0) {
+			$jsonData['success'] = true;
+			$jsonData['data'] = $restaurant;
+		}
+		// send response data to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * this method check user has permission to edit restaurant
+	 * @param restaurant_id
+	 * @param restaurant_creator
+	 * @return	object
+	 */
+	function has_permission_to_edit_restaurant()
+	{
+		// intialize response data
+		$jsonData = array('success' => false);
+		$restaurant_creator = $this->input->post('restaurant_creator');
+		$restaurant_id = $this->input->post('restaurant_id');
+		$action = $this->input->post('action');
+		// fetch restaurant through this method
+		$data = $this->restaurant_model->fetch_restaurant_by_creator_and_id($restaurant_creator, $restaurant_id);
+		// if data found 
+		if ($data->num_rows() > 0) {
+			if ($this->permission->has_permission('restaurant', $action)) {
+				$jsonData['success'] = true;
+			}
+		}
+		// send response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * restaurant info update by this method. 
+	 * Return success TRUE if restaurant info updated successfully
+	 * otherwise success FALSE.
+	 *
+	 * @param	
+	 * @return	object
+	 */
+	function update()
+	{
+		// response array
+		$jsonData = array('success' => false, 'check' => false, 'errors' => array());
+		// create validation rules array
+		$rules = array(
+			array('field' => 'restaurant_name', 'label' => 'Name', 'rules' => 'required'),
+			array('field' => 'restaurant_address', 'label' => 'Address', 'rules' => 'required'),
+			array('field' => 'restaurant_open_at', 'label' => 'Opening time', 'rules' => 'required'),
+			array('field' => 'restaurant_close_at', 'label' => 'Closing time', 'rules' => 'required'),
+			array('field' => 'restaurant_establish_date', 'label' => 'Establish year', 'rules' => 'required'),
+		);
+		// set rules for validation
+		$this->form_validation->set_rules($rules);
+		// if validation is done & everything is valid
+		if ($this->form_validation->run()) {
+			$jsonData['check'] = true;
+
+			// get restaurant id
+			$restaurant_id = $this->input->post('restaurant_id');
+			$restaurant_banner = $this->input->post('restaurant_banner');
+			$restaurant_logo = $this->input->post('restaurant_logo');
+
+
+			// if tag selected
+			if (!empty($_POST['tags'])) {
+				// convert tags from string to array
+				$tags = explode(',', $_POST['tags']);
+				/**
+				 * first remove old tags
+				 * then create many to many relationship
+				 * with restaurant and tag
+				 */
+				$result = $this->restaurant_model->remove_restaurant_tags($restaurant_id);
+				if ($result) {
+					$this->add_tags_with_restaurant($tags, $restaurant_id);
+				}
+			}
+
+			// if restaurant banner is provided
+			if(isset($_FILES['restaurant_new_banner']['name']) && $_FILES['restaurant_new_banner']['name'] != ''){
+				$folder = 'restaurant-'.$restaurant_id;
+				$ext = pathinfo($_FILES['restaurant_new_banner']['name'], PATHINFO_EXTENSION);
+				$file_name = 'banner-'.time().'.'.$ext;
+
+				$_FILES['restaurant_new_banner']['name']=$file_name;
+				$path = './uploads/restaurant/'.$folder;
+
+				// old banner path
+				$oldBanner = $path.'/'.$restaurant_banner;
+				/**
+				 * check if old banner is exists
+				 * then delete first
+				 */
+				if (file_exists($oldBanner)) {
+					// give permission to delete
+					chmod($oldBanner, 0777);
+					unlink($oldBanner);
+				}
+
+				// if directory not exists, create
+				if (!is_dir($path)) {
+					mkdir($path, 0777, true);
+				}
+				$config['upload_path'] 		= $path;
+				$config['allowed_types'] 	='*';
+				
+				// load upload library
+				$this->load->library('upload', $config);
+				// check image uploaded or not
+				if($this->upload->do_upload('restaurant_new_banner')){
+					// update restaurant info
+					$imageData = array(
+						'restaurant_banner' => $file_name,
+					);
+					$this->db->where('restaurant_id',$restaurant_id);
+					$this->db->update('restaurants',$imageData);
+				}
+			}
+
+			// if restaurant logo is provided
+			if(isset($_FILES['restaurant_new_logo']['name']) && $_FILES['restaurant_new_logo']['name'] != ''){
+				$folder = 'restaurant-'.$restaurant_id;
+				$ext = pathinfo($_FILES['restaurant_new_logo']['name'], PATHINFO_EXTENSION);
+				$file_name = 'logo-'.time().'.'.$ext;
+
+				$_FILES['restaurant_new_logo']['name']=$file_name;
+				$path = './uploads/restaurant/'.$folder;
+
+				// old logo path
+				$oldLogo = $path.'/'.$restaurant_logo;
+				/**
+				 * check if old logo is exists
+				 * then delete first
+				 */
+				if (file_exists($oldLogo)) {
+					// give permission to delete
+					chmod($oldLogo, 0777);
+					unlink($oldLogo);
+				}
+
+				// if directory not exists, create
+				if (!is_dir($path)) {
+					mkdir($path, 0777, true);
+				}
+				$config['upload_path'] 		= $path;
+				$config['allowed_types'] 	='*';
+				
+				// load upload library
+				$this->load->library('upload', $config);
+				// check image uploaded or not
+				if($this->upload->do_upload('restaurant_new_logo')){
+					// update restaurant info
+					$imageData = array(
+						'restaurant_logo' => $file_name,
+					);
+					$this->db->where('restaurant_id',$restaurant_id);
+					$this->db->update('restaurants',$imageData);
+				}
+			}
+
+			// update restaurant info
+			$restaurantData = array(
+				'restaurant_moto' => $this->input->post('restaurant_moto'),
+				'restaurant_name' => $this->input->post('restaurant_name'),
+				'restaurant_address' => $this->input->post('restaurant_address'),
+				'restaurant_open_at' => date('H:i:s', strtotime($this->input->post('restaurant_open_at'))),
+				'restaurant_close_at' => date('H:i:s', strtotime($this->input->post('restaurant_close_at'))),
+				'restaurant_establish_date' => date('Y-m-d', strtotime($this->input->post('restaurant_establish_date'))),
+				'restaurant_moto' => $this->input->post('restaurant_moto'),
+				'restaurant_email' => $this->input->post('restaurant_email'),
+				'restaurant_slug' => url_title($this->input->post('restaurant_name'), "dash", true),
+				'restaurant_created_at' => date('Y-m-d H:i:s'),
+				'restaurant_creator' => $this->session->userdata('user_id')
+			);
+			// update restaurant through restaurant model
+			$result = $this->restaurant_model->update($restaurantData, $restaurant_id);
+
+			if ($result) {
+				$jsonData['success'] = true;
+			}
+
 		} else {
 			foreach ($_POST as $key => $value) {
 				$jsonData['errors'][$key] = strip_tags(form_error($key));
@@ -300,6 +530,7 @@ class Restaurant extends CI_Controller {
 		$perpage = 10;
 		// take search parameters
 		$query['search'] = $this->input->get('search');
+		$query['restaurant_creator'] = $this->session->userdata('user_id');
 
 		// response object
 		$jsonData = array('success' => false, 'data' => array(), 'links' => '');
@@ -328,6 +559,31 @@ class Restaurant extends CI_Controller {
 			$jsonData['links'] = $this->custom->paginate($obj);
 		}
 		// responde send
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * restaurant status change by this method. 
+	 * if status change
+	 * Return success true 
+	 * otherwise false.
+	 *
+	 * @return	array[object] restaurantlist
+	 */
+	function changestatus()
+	{
+		// intialize response data
+		$jsonData = array('success' => false);
+		$restaurant_status = $this->input->post('restaurant_status');
+		$restaurant_id = $this->input->post('restaurant_id');
+		// change status through this method
+		$result = $this->restaurant_model->change_status($restaurant_status, $restaurant_id);
+
+		// if status changed 
+		if ($result) {
+			$jsonData['success'] = true;
+		}
+		// send response to client
 		echo json_encode($jsonData);
 	}
 }

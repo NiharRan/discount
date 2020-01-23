@@ -1,7 +1,5 @@
 Vue.component("multiselect", window.VueMultiselect.default);
 
-$('#restaurant_open_at,#restaurant_close_at').datepicker();
-
 var base_url = $("#base_url").val();
 new Vue({
   el: "#resturant_entry_form",
@@ -19,8 +17,8 @@ new Vue({
         restaurant_establish_date: '',
         tags: []
     },
-    bannerUrl: "url("+base_url+"uploads/default/restaurant/banner.jpg)",
-    logoUrl: "url("+base_url+"uploads/default/restaurant/logo.png)",
+    bannerUrl: "url("+base_url+"uploads/default/restaurant/default-banner.jpg)",
+    logoUrl: "url("+base_url+"uploads/default/restaurant/default-logo.png)",
     tags: [],
     errors: {
       restaurant_name: '',
