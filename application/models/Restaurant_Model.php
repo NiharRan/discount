@@ -14,7 +14,12 @@ class Restaurant_Model extends CI_Model
 	function __construct()
 	{
 		parent::__construct();
-
+		$this->load->model('user_model');
+		$this->load->model('tag_model');
+		$this->load->model('rating_model');
+		$this->load->model('template_model');
+		$this->load->model('offer_model');
+		$this->load->model('global_model');
 	}
 
 	/**
@@ -52,8 +57,8 @@ class Restaurant_Model extends CI_Model
 	}
 	
 	/**
-     * this method fetch all resturants created by the user
-     * @param user_id ineger
+     * this method fetch all restaurants created by the user
+     * @param user_id integer
      * @return restaurantList array
      */
 	function fetch_restaurants_by_user_info($user_id)
@@ -61,7 +66,8 @@ class Restaurant_Model extends CI_Model
 		return $this->db->select('*')
 						->from('restaurants')
 						->where('restaurant_creator', $user_id)
-						->get();
+						->get()
+						->result_array();
 	}
 
 	/**
@@ -73,7 +79,9 @@ class Restaurant_Model extends CI_Model
     {
         $search = $query['search'];
         $this->db->select('*')->from($this->table);
-        if(!empty($search)) $this->db->like('restaurent_name', $search);
+        if(!empty($search)) {
+			$this->db->like('restaurant_name', $search);
+		}
         return $this->db->get()->num_rows();
     }
 
@@ -82,7 +90,7 @@ class Restaurant_Model extends CI_Model
      * @param limit integer
      * @param start integer
      * @param query object
-     * @return restaurents object list
+     * @return restaurants object list
      */
     function fetch_all_restaurants($limit, $start, $query)
     {
@@ -95,19 +103,19 @@ class Restaurant_Model extends CI_Model
 		$query = $this->db->limit($limit, $start)->get()->result_array();
 		
 		foreach ($query as $key => $restaurant) {
-			// this metho dfetch all tags of a restaurant
-			$tags = $this->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
-			$query[$key]['tags'] = $tags->result();
+			// this method fetch all tags of a restaurant
+			$tags = $this->tag_model->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
+			$query[$key]['tags'] = $tags;
 
-			// this metho dfetch all tags of a restaurant
-			$ratings = $this->fetch_all_ratings_of_restaurant($restaurant['restaurant_id']);
+			// this method fetch all tags of a restaurant
+			$ratings = $this->global_model->with('ratings', 'restaurant_id', $restaurant['restaurant_id']);
 			$query[$key]['rating'] = '';
 			// total rows
-			$totalRows = $ratings->num_rows();
+			$totalRows = count($ratings);
 			// sum of rating points
 			$sumOfRating = 0;
-			foreach ($ratings->result() as $rating) {
-				$sumOfRating += $rating->rating;
+			foreach ($ratings as $rating) {
+				$sumOfRating += $rating['rating'];
 			}
 			// if restaurant has rating
 			if ($totalRows != 0) {
@@ -117,76 +125,13 @@ class Restaurant_Model extends CI_Model
 			}
 
 			// this method fetch restaurant creator info
-			$user = $this->fetch_user_info_by_restaurant($restaurant['restaurant_id']);
-			$query[$key]['creator'] = $user->row();
+			$user = $this->global_model->with('users', 'id', $restaurant['restaurant_creator']);
+			$query[$key]['creator'] = $user;
 
 		}
 
 		// return data from server
 		return $query;
-	}
-
-	 /**
-     * this method fetch single restaurant
-     * @param limit integer
-     * @return restaurent object
-     */
-	function fetch_restaurant_info_by_slug($slug)
-	{
-		$query = $this->db->select('*')
-						  ->from('restaurants')
-						  ->where('restaurant_slug', $slug)
-						  ->limit(1)
-						  ->get()
-						  ->result_array();
-
-		foreach ($query as $key => $restaurant) {
-			// this metho dfetch all tags of a restaurant
-			$tags = $this->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
-			$query[$key]['tags'] = $tags->result();
-
-			// this metho dfetch all tags of a restaurant
-			$ratings = $this->fetch_all_ratings_of_restaurant($restaurant['restaurant_id']);
-			$query[$key]['rating'] = '';
-			// total rows
-			$totalRows = $ratings->num_rows();
-			// sum of rating points
-			$sumOfRating = 0;
-			foreach ($ratings->result() as $rating) {
-				$sumOfRating += $rating->rating;
-			}
-			// if restaurant has rating
-			if ($totalRows != 0) {
-				// average of rating
-				$query[$key]['totalRated'] = $totalRows;
-				$query[$key]['rating'] =  number_format($sumOfRating / $totalRows, 1, '.', '');
-			}
-
-			// this method fetch restaurant creator info
-			$user = $this->fetch_user_info_by_restaurant($restaurant['restaurant_id']);
-			$query[$key]['creator'] = $user->row();
-
-		}
-
-		// return data from server
-		return $query;
-	}
-	
-	/**
-	 * this method fetch all tags by restaurant id
-	 * @param restaurant_id
-	 * @return tags
-	 */
-	function fetch_all_tags_of_restaurant($restaurant_id)
-	{
-		return $this->db->select('tags.*')
-						->from('tags')
-						->join('restaurant_tags', 'tags.tag_id=restaurant_tags.tag_id')
-						->where(array(
-							'restaurant_tags.restaurant_id' => $restaurant_id,
-							'tag_status'    => 1
-						))
-						->get();
 	}
 
 	/**
@@ -201,38 +146,6 @@ class Restaurant_Model extends CI_Model
 						->delete('restaurant_tags');
 	}
 
-	/**
-	 * this method fetch all user info by restaurant id
-	 * @param restaurant_id
-	 * @return user
-	 */
-	function fetch_user_info_by_restaurant($restaurant_id)
-	{
-		return $this->db->select('users.*')
-						->from('users')
-						->join('restaurants', 'users.id=restaurants.restaurant_creator')
-						->where(array(
-							'restaurants.restaurant_id' => $restaurant_id,
-						))
-						->limit(1)
-						->get();
-	}
-
-	/**
-	 * this method fetch all rating info by restaurant id
-	 * @param restaurant_id
-	 * @return rating
-	 */
-	function fetch_all_ratings_of_restaurant($restaurant_id)
-	{
-		return $this->db->select('ratings.*')
-						->from('ratings')
-						->join('restaurants', 'ratings.restaurant_id=restaurants.restaurant_id')
-						->where(array(
-							'restaurants.restaurant_id' => $restaurant_id,
-						))
-						->get();
-	}
 
 	/**
      * this method update restaurant status
@@ -248,20 +161,107 @@ class Restaurant_Model extends CI_Model
 						->update($this->table);
 	}
 
+	 /**
+     * this method fetch restaurant info on condition
+     * @return restaurantInfo object 
+     */
+    public function fetch_restaurant_on_condition($query)
+    {
+        $this->db->select('*')->from('restaurants');
+        
+        if (isset($query['restaurant_id']) && !empty($query['restaurant_id'])) {
+            $this->db->where('restaurant_id', $query['restaurant_id']);
+        }
+
+        if (isset($query['restaurant_creator']) && !empty($query['restaurant_creator'])) {
+            $this->db->where('restaurant_creator', $query['restaurant_creator']);
+		}
+		
+		if (isset($query['restaurant_slug']) && !empty($query['restaurant_slug'])) {
+            $this->db->where('restaurant_slug', $query['restaurant_slug']);
+        }
+
+        $query = $this->db->get()->result_array();
+        // with restaurant info
+        foreach ($query as $key => $restaurant) {
+            // this metho dfetch all tags of a restaurant
+			$tags = $this->tag_model->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
+			$query[$key]['tags'] = $tags;
+
+			// this metho dfetch all tags of a restaurant
+			$ratings = $this->global_model->with('ratings', 'restaurant_id', $restaurant['restaurant_id']);
+			$query[$key]['rating'] = '';
+			// total rows
+			$totalRows = count($ratings);
+			// sum of rating points
+			$sumOfRating = 0;
+			foreach ($ratings as $rating) {
+				$sumOfRating += $rating['rating'];
+			}
+			// if restaurant has rating
+			if ($totalRows != 0) {
+				// average of rating
+				$query[$key]['totalRated'] = $totalRows;
+				$query[$key]['rating'] =  number_format($sumOfRating / $totalRows, 1, '.', '');
+			}
+
+			// this method fetch restaurant creator info
+			$user = $this->global_model->with('users', 'id', $restaurant['restaurant_creator']);
+			$query[$key]['creator'] = $user;
+        }
+        return count($query) == 1 ? $query[0] : $query;
+    }
+
 	/**
-	 * this method restaurant by restaurant id & creator
-	 * @param restaurant_id
+	 * this method fetch restaurants by creator
 	 * @param restaurant_creator
 	 * @return restaurant
 	 */
-	function fetch_restaurant_by_creator_and_id($restaurant_creator, $restaurant_id)
+	function fetch_all_active_restaurants_of_user($restaurant_creator)
 	{
 		return $this->db->select('*')
 						->from($this->table)
 						->where(array(
-							'restaurant_id' => $restaurant_id,
+							'restaurant_status' => 1,
 							'restaurant_creator' => $restaurant_creator,
 						))
-						->get();
+						->get()
+						->result_array();
 	}
+
+	/**
+	 * this method fetch restaurants by creator
+	 * @param restaurant_creator
+	 * @return restaurant
+	 */
+	function fetch_all_restaurants_of_user($restaurant_creator)
+	{
+		return $this->db->select('*')
+						->from($this->table)
+						->where(array(
+							'restaurant_creator' => $restaurant_creator,
+						))
+						->get()
+						->result_array();
+	}
+
+
+	/**
+	 * this method fetch restaurants by tag
+	 * @param tag_id
+	 * @return restaurant
+	 */
+	function fetch_all_restaurants_of_tag($tag_id)
+	{
+		return $this->db->select('restaurants.*')
+						->from('restaurants')
+						->join('restaurant_tags', 'restaurants.restaurant_id=restaurant_tags.restaurant_id')
+						->where(array(
+							'restaurant_tags.tag_id' => $tag_id,
+							'restaurant_status'    => 1
+						))
+						->get()
+						->result_array();
+	}
+
 }

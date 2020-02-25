@@ -59,6 +59,7 @@ class Tag extends CI_Controller {
 			// store all tags one by one
 			$data = array(
 				'tag_name' => $tags[$key],
+				'tag_slug' => url_title($tags[$key]),
 				'tag_status' => 1,
 				'tag_created_at' => date('Y-m-d')
 			);
@@ -93,6 +94,7 @@ class Tag extends CI_Controller {
 			$jsonData['check'] = true;
 			// get tag name and id
 			$data['tag_name'] = $this->input->post('tag_name');
+			$data['tag_slug'] = url_title($this->input->post('tag_name'));
 			$tag_id = $this->input->post('tag_id');
 
 			$result = $this->tag_model->update($data, $tag_id);
@@ -171,9 +173,9 @@ class Tag extends CI_Controller {
 		 *   data => taglist
 		 * 	 links => pagination links
 		 */
-		if ($tags->num_rows() > 0) {
+		if (count($tags) > 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $tags->result();
+			$jsonData['data'] = $tags;
 			$jsonData['links'] = $this->custom->paginate($obj);
 		}
 		// responde send
@@ -199,11 +201,37 @@ class Tag extends CI_Controller {
 		 * 	 success => everything all right
 		 *   data => taglist
 		 */
-		if ($tags->num_rows() > 0) {
+		if (count($tags) > 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $tags->result();
+			$jsonData['data'] = $tags;
 		}
 		// responde send
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * tag status change by this method. 
+	 * if status change
+	 * Return success true 
+	 * otherwise false.
+	 *
+	 * @return	true/false
+	 */
+	function changestatus()
+	{
+		// intialize response data
+		$jsonData = array('success' => false);
+		$tag_status = $this->input->post('tag_status');
+		$tag_id = $this->input->post('tag_id');
+		// change status through this method
+		$result = $this->db->set('tag_status', $tag_status == 1 ? 0 : 1)
+						->where('tag_id', $tag_id)
+						->update("tags");
+		// if status changed 
+		if ($result) {
+			$jsonData['success'] = true;
+		}
+		// send response to client
 		echo json_encode($jsonData);
 	}
     

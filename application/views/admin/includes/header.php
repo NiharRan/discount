@@ -1,29 +1,18 @@
   <nav class="navbar navbar-top navbar-expand-md bg-gradient-primary navbar-dark" id="navbar-main">
       <div class="container-fluid">
         <!-- Brand -->
-        <button class="btn-toggler" type="button">
+        <button class="btn-toggler btn-toggler-pc" type="button">
         <i class="fas fa-bars text-white"></i>
         </button>
 
-        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/">Dashboard</a>
-        <!-- Form -->
-        <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
-          <div class="form-group mb-0">
-            <div class="input-group input-group-alternative">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-              </div>
-              <input class="form-control" placeholder="Search" type="text">
-            </div>
-          </div>
-        </form>
+        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/">Welcome To Offer</a>
         <!-- User -->
         <ul class="navbar-nav align-items-center d-none d-md-flex">
           <li class="nav-item dropdown">
             <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <div class="media align-items-center">
                 <span class="avatar avatar-sm rounded-circle">
-                  <img alt="Image placeholder" src="<?php echo base_url(); ?>assets/img/theme/team-4-800x800.jpg">
+                  <img alt="Image placeholder" src="<?php echo base_url(); ?>uploads/user/user-<?php echo $this->session->userdata('user_id'); ?>/<?php echo $this->session->userdata('avatar');?>">
                 </span>
                 <div class="media-body ml-2 d-none d-lg-block">
                   <span class="mb-0 text-sm  font-weight-bold"><?php echo $this->session->userdata('name'); ?></span>
@@ -34,21 +23,13 @@
               <div class=" dropdown-header noti-title">
                 <h6 class="text-overflow m-0">Welcome!</h6>
               </div>
-              <a href="./examples/profile.html" class="dropdown-item">
+              <a href="<?php echo site_url('users/'.$this->session->userdata('username')); ?>" class="dropdown-item">
                 <i class="ni ni-single-02"></i>
                 <span>My profile</span>
               </a>
-              <a href="./examples/profile.html" class="dropdown-item">
+              <a href="<?php echo site_url('users/setting/'.$this->session->userdata('username')); ?>" class="dropdown-item">
                 <i class="ni ni-settings-gear-65"></i>
                 <span>Settings</span>
-              </a>
-              <a href="./examples/profile.html" class="dropdown-item">
-                <i class="ni ni-calendar-grid-58"></i>
-                <span>Activity</span>
-              </a>
-              <a href="./examples/profile.html" class="dropdown-item">
-                <i class="ni ni-support-16"></i>
-                <span>Support</span>
               </a>
               <div class="dropdown-divider"></div>
               <a href="<?php echo base_url(); ?>auth/logout" class="dropdown-item">

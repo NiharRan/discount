@@ -89,6 +89,14 @@
   
   ?>
 
+<?php if(isset($editor)) {?>
+<script src="<?php echo base_url(); ?>assets/js/<?php echo $editor; ?>.js"></script>
+<?php }?>
+
+<?php if(isset($editorVue)) {?>
+<script src="<?php echo base_url(); ?>assets/js/<?php echo $editorVue; ?>.js"></script>
+<?php }?>
+
 <!-- 
   vue component will be linkedup here
  -->

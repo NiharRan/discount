@@ -96,13 +96,15 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-12">
-                                <div class="banner-logo-upload-box width-full mb-4" :style="{ backgroundImage: bannerUrl}">
+                                <div class="banner-logo-upload-box width-full mb-4">
+                                    <img :src="bannerUrl" alt="">
                                     <label class="btn-pill">
                                         <i class="fas fa-camera"></i>
                                         <input @change="selectBanner" type="file" class="hidden"/>
                                     </label>
                                 </div>
-                                <div class="banner-logo-upload-box width-half" :style="{ backgroundImage: logoUrl}">
+                                <div class="banner-logo-upload-box width-half">
+                                    <img :src="logoUrl" alt="">
                                     <label class="btn-pill">
                                         <i class="fas fa-camera"></i>
                                         <input @change="selectLogo" type="file" class="hidden"/>

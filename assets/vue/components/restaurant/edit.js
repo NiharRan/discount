@@ -6,6 +6,7 @@ new Vue({
   data: {
     formData: {
     },
+    bannerUrl: base_url + 'uploads/default/restaurant/default-banner.jpg',
     restaurant_new_banner: '',
     restaurant_new_logo: '',
     tags: [],
@@ -21,13 +22,14 @@ new Vue({
 
   methods: {
     selectBanner(e) {
-      this.restaurant_new_banner = e.target.files[0];
+      var file = e.target.files[0];
+      this.formData.restaurant_banner = file;
+      this.bannerUrl = URL.createObjectURL(file);
     },
     selectLogo(e) {
-      this.restaurant_new_logo = e.target.files[0];
-    },
-    formatTime(time) {
-      return moment(time).format("HH:mm:SS");
+      var file = e.target.files[0];
+      this.formData.restaurant_logo = file;
+      this.logoUrl = URL.createObjectURL(file);
     },
     formatDate(date) {
       return moment(date).format("YYYY-MM-DD");
@@ -52,8 +54,8 @@ new Vue({
       formData.append("restaurant_contact_number", self.formData.restaurant_contact_number);
       formData.append("restaurant_email", self.formData.restaurant_email);
       formData.append("restaurant_address", self.formData.restaurant_address);
-      formData.append("restaurant_open_at", self.formatTime(self.formData.restaurant_open_at)); // Exp: 21:31:45
-      formData.append("restaurant_close_at", self.formatTime(self.formData.restaurant_close_at)); // Exp: 21:31:45
+      formData.append("restaurant_open_at", self.formData.restaurant_open_at); // Exp: 21:31:45
+      formData.append("restaurant_close_at", self.formData.restaurant_close_at); // Exp: 21:31:45
       formData.append("restaurant_establish_date", self.formatDate(self.formData.restaurant_establish_date)); // Exp: 21-01-2020
       formData.append("restaurant_banner", self.formData.restaurant_banner);
       formData.append("restaurant_logo", self.formData.restaurant_logo);
@@ -74,7 +76,7 @@ new Vue({
               showConfirmButton: false,
               timer: 1500
           });
-          window.open(base_url+"restaurants");
+          window.close();
         }else {
             // if not successfull
             Swal.fire({
@@ -92,7 +94,7 @@ new Vue({
       // call request to server to fetch restaurant info
       var { data } = await axios.get(base_url+'restaurant/edit/'+slug);
       if (data.success) {
-        self.formData = data.data[0];
+        self.formData = data.data;
       }
     },
     async fetchtags() {

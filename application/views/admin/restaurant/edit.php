@@ -96,13 +96,15 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-12">
-                                <div class="banner-logo-upload-box width-full mb-4" :style=" [ formData.restaurant_banner != '' ? { 'background-image': 'url(<?php echo base_url(); ?>uploads/restaurant/restaurant-'+formData.restaurant_id+'/'+formData.restaurant_banner+')' } : { 'background-image': 'url(<?php echo base_url(); ?>uploads/default/restaurant/default-banner.jpg)' } ] ">
+                                <div class="banner-logo-upload-box width-full mb-4">
+                                    <img id="banner" :src="[ formData.restaurant_banner != '' ? '<?php echo base_url(); ?>uploads/restaurant/restaurant-'+formData.restaurant_id+'/'+formData.restaurant_banner : bannerUrl ]" alt="">
                                     <label class="btn-pill">
                                         <i class="fas fa-camera"></i>
                                         <input @change="selectBanner" type="file" class="hidden"/>
                                     </label>
                                 </div>
-                                <div class="banner-logo-upload-box width-half" :style=" [ formData.restaurant_logo != '' ? { 'background-image': 'url(<?php echo base_url(); ?>uploads/restaurant/restaurant-'+formData.restaurant_id+'/'+formData.restaurant_logo+')' } : { 'background-image': 'url(<?php echo base_url(); ?>uploads/default/restaurant/default-banner.jpg)' } ] ">
+                                <div class="banner-logo-upload-box width-half">
+                                    <img id="logo" :src="[ formData.restaurant_logo != '' ? '<?php echo base_url(); ?>uploads/restaurant/restaurant-'+formData.restaurant_id+'/'+formData.restaurant_logo : logoUrl ]" alt="">
                                     <label class="btn-pill">
                                         <i class="fas fa-camera"></i>
                                         <input @change="selectLogo" type="file" class="hidden"/>

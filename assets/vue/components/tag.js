@@ -32,7 +32,7 @@ new Vue({
       }
       this.options.push(tag);
     },
-    store(){
+    async store(){
         // store vue object to self veriable
         var self = this;
         // if tag form is not empty
@@ -44,47 +44,41 @@ new Vue({
            * convert tags object array to tag name array
            * exp. [tag1, tag2, tag3, tag4]
            */
-          var tags = self.formData.tags.map(function (tag) {
+          var tags = await self.formData.tags.map(function (tag) {
             return tag.tag_name
           })
           // add tag name array to formData object
           data.append("tags", tags);
           // send api post request to server
-          axios
-            .post(base_url + "settings/tags/store", data)
-            .then(function({ data }) {
-              // if data stored in server
-              if (data.success) {
-                // hide loading icon
-                self.isloading = false;
-                // fetch taglist along with new tag
-                self.fetchtags();
-                // close tagcreateModal
-                $('#tagCreateModal').modal('hide');
-                // clean formData form
-                self.formData.tags = [];
-                // clean errors
-                self.errors = {};
-                // show success message
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: "Tags stored successfully",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              } else {
-                  // if not successfull
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!"
-                });
-              }
-            })
-            .catch(function(errors) {
-              console.log(errors);
+          var {data} = await axios.post(base_url + "settings/tags/store", data)
+          // if data stored in server
+          if (data.success) {
+            // hide loading icon
+            self.isloading = false;
+            // fetch taglist along with new tag
+            self.fetchtags();
+            // close tagcreateModal
+            $('#tagCreateModal').modal('hide');
+            // clean formData form
+            self.formData.tags = [];
+            // clean errors
+            self.errors = {};
+            // show success message
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Tags stored successfully",
+              showConfirmButton: false,
+              timer: 1500
             });
+          } else {
+              // if not successfull
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!"
+            });
+          }
         }else {
             /**
              * if required field is empty
@@ -95,7 +89,7 @@ new Vue({
             }
         }
     },
-    update() {
+    async update() {
       var self = this;
       var data = new FormData();
 
@@ -104,47 +98,41 @@ new Vue({
       data.append("tag_id", self.formData.tag_id);
 
       // send api request to server
-      axios
-        .post(base_url + "settings/tags/update", data)
-        .then(function({ data }) {
-          if (data.check) {
+      var {data} = await axios.post(base_url + "settings/tags/update", data)
+      if (data.check) {
 
-            /**
-             * if data validation done
-             * check data updated or not
-             */
-            if (data.success) {
+        /**
+         * if data validation done
+         * check data updated or not
+         */
+        if (data.success) {
 
-              // if updateed then fetch taglist
-              self.fetchtags();
-              // clean error object
-              self.errors = {};
-              // close modal
-              $("#tagEditModal").modal("hide");
-              // show success message
-              Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: "Tag updated successfully",
-                showConfirmButton: false,
-                timer: 1500
-              });
-            } else {
-              // if not updated then show warning message
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!"
-              });
-            }
-          } else {
-            // if form-validation faild fetch error messages
-            self.errors = data.errors;
-          }
-        })
-        .catch(function(errors) {
-          console.log(errors);
-        });
+          // if updateed then fetch taglist
+          self.fetchtags();
+          // clean error object
+          self.errors = {};
+          // close modal
+          $("#tagEditModal").modal("hide");
+          // show success message
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Tag updated successfully",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          // if not updated then show warning message
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!"
+          });
+        }
+      } else {
+        // if form-validation faild fetch error messages
+        self.errors = data.errors;
+      }
     },
     edit(tag) {
       // open tag edit modal
@@ -152,9 +140,9 @@ new Vue({
       this.formData.tag_name = tag.tag_name;
       this.formData.tag_id = tag.tag_id;
     },
-    remove(id) {
+    async remove(id) {
       var self = this;
-      Swal.fire({
+      var result = await Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
         icon: "warning",
@@ -162,27 +150,20 @@ new Vue({
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!"
-      }).then(result => {
-        if (result.value) {
-          axios
-            .get(base_url + "settings/tags/remove/" + id)
-            .then(function({ data }) {
-              if (data.success) {
-                self.fetchtags();
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: "Tag deleted successfully",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
+      })
+      if (result.value) {
+        var {data} = await axios.get(base_url + "settings/tags/remove/" + id)
+        if (data.success) {
+          self.fetchtags();
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Tag deleted successfully",
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
-      });
+      }
     },
     fetchtags() {
       /**
@@ -200,89 +181,46 @@ new Vue({
        */
       this.getPaginateData(url, data);
     },
-    getPaginateData(url, data) {
+    async getPaginateData(url, data) {
       // set vue to self veriable
       var self = this;
       // call the api get request through url
-      axios.get(url, {
+      var {data} = await axios.get(url, {
         params: data
       })
-      .then(function ({data}) {
-        if (data.success) {
-          // if data is found
-          // store them
-          self.tags = data.data;
-          self.links = data.links
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
+      if (data.success) {
+        // if data is found
+        // store them
+        self.tags = data.data;
+        self.links = data.links
+      }
     },
-    deactivate(tag) {
+    async changeStatus(tag) {
+      /**
+       * this method change tag's status
+       * @param tag_status
+       * @response success
+       */
+      var formData = new FormData();
       var self = this;
-      Swal.fire({
-        title: "Are you sure?",
-        text: tag.tag_name+" will be deactivated",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, deactivate it!"
-      }).then(result => {
-        if (result.value) {
-          axios
-            .get(base_url + "tag/changeStatusById/" + tag.tag_code+"/"+tag.tag_status)
-            .then(function({ data }) {
-              if (data.success) {
-                self.fetchtags();
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: tag.tag_name+" deactivated successfully",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        }
-      });
+      var statusMsg = tag.tag_status == 1 ? "Inactive" : "Active";
+      formData.append('tag_status', tag.tag_status);
+      formData.append('tag_id', tag.tag_id);
+
+      // send request to server
+      var {data} = await axios.post(base_url+'settings/tags/change-status', formData);
+      // if status updated
+      if (data.success) {
+        self.fetchtags();
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "tag now "+ statusMsg,
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
     },
-    activate(tag) {
-      var self = this;
-      Swal.fire({
-        title: "Are you sure?",
-        text: tag.tag_name+" will be activate",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, active it!"
-      }).then(result => {
-        if (result.value) {
-          axios
-            .get(base_url + "tag/changeStatusById/" + tag.tag_code+"/"+tag.tag_status)
-            .then(function({ data }) {
-              if (data.success) {
-                self.fetchtags();
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: tag.tag_name+" activate successfully",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        }
-      });
-    }
   },
   created() {
     // after page is created call those method

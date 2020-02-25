@@ -1,13 +1,26 @@
 Vue.component("multiselect", window.VueMultiselect.default);
 var base_url = $("#base_url").val();
+Vue.use( CKEditor );
 new Vue({
   el: "#restaurants_info",
   data: {
+    editor: ClassicEditor,
+    editorConfig: {},
     formData: {
+      restaurant_id: "",
+      restaurant_name: "",
+      template_id: "",
+      offer_name: "",
+      offer_description: "",
+      offer_discount: "",
+      offer_start: "",
+      offer_end: "",
     },
+    errors: {},
     options: [],
     links: '',
     restaurants: [],
+    templates: [],
     restaurant: {},
     search: '',
     isloading: false,
@@ -41,6 +54,64 @@ new Vue({
     preview(restaurant) {
       this.restaurant = restaurant;
       $('#previewModal').modal('show');
+      this.isloading = true;
+      var self = this;
+      setTimeout(function () {
+        self.isloading = false;
+      }, 2000);
+    },
+    openOfferModal(restaurant) {
+      this.formData.restaurant_id = restaurant.restaurant_id;
+      this.formData.restaurant_name = restaurant.restaurant_name;
+      $('#offerModal').modal('show');
+      this.isloading = true;
+      var self = this;
+      setTimeout(function () {
+        self.isloading = false;
+      }, 1000);
+    },
+    async createOffer() {
+       // store vue object to self veriable
+       var self = this;
+       var template_id = typeof self.formData.template_id == "object" ? self.formData.template_id.template_id : '';
+       var data = new FormData();
+       data.append("offer_name", self.formData.offer_name);
+       data.append("restaurant_id", self.formData.restaurant_id);
+       data.append("restaurant_name", self.formData.restaurant_name);
+       data.append("offer_description", self.formData.offer_description);
+       data.append("offer_discount", self.formData.offer_discount);
+       data.append("offer_start", self.formData.offer_start);
+       data.append("offer_end", self.formData.offer_end);
+       data.append("template_id", template_id);
+       // send api post request to server
+       var {data} = await axios.post(base_url + "offer/store", data);
+       // if form validation done
+       if (data.check) {
+         // if data stored in server
+         if (data.success) {
+           // show success message
+           Swal.fire({
+               position: "top-end",
+               icon: "success",
+               title: "Offer created successfully",
+               showConfirmButton: false,
+               timer: 1500
+           });
+           $("#offerModal").modal("hide");
+           Object.keys(self.formData).forEach(function (key) {
+             self.formData[key] = "";
+           })
+         }else {
+             // if not successfull
+             Swal.fire({
+               icon: "error",
+               title: "Oops...",
+               text: "Something went wrong!"
+             });
+         }
+       } else {
+         self.errors = data.errors;
+       }
     },
     async changeStatus(restaurant) {
       /**
@@ -55,7 +126,7 @@ new Vue({
       formData.append('restaurant_id', restaurant.restaurant_id);
 
       // send request to server
-      var {data} = await axios.post(base_url+'restaurants/change-status', formData);
+      var {data} = await axios.post(base_url+'restaurant/change-status', formData);
       // if status updated
       if (data.success) {
         self.fetchrestaurants();
@@ -66,6 +137,12 @@ new Vue({
           showConfirmButton: false,
           timer: 1500
         });
+      }
+    },
+    async fetchAllActiveTemplates() {
+      var {data} = await axios.get(base_url+"templates/active");
+      if (data.success) {
+        this.templates = data.data;
       }
     },
     fetchrestaurants() {
@@ -102,6 +179,7 @@ new Vue({
   created() {
     // after page is created call those method
     this.fetchrestaurants();
+    this.fetchAllActiveTemplates();
 
     var self = this;
     // if click on pagination link icon

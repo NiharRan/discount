@@ -17,8 +17,8 @@ new Vue({
         restaurant_establish_date: '',
         tags: []
     },
-    bannerUrl: "url("+base_url+"uploads/default/restaurant/default-banner.jpg)",
-    logoUrl: "url("+base_url+"uploads/default/restaurant/default-logo.png)",
+    bannerUrl: base_url+"uploads/default/restaurant/default-banner.jpg",
+    logoUrl: base_url+"uploads/default/restaurant/default-logo.png",
     tags: [],
     errors: {
       restaurant_name: '',
@@ -32,12 +32,16 @@ new Vue({
 
   methods: {
     selectBanner(e) {
-      this.formData.restaurant_banner = e.target.files[0];
+      var file = e.target.files[0];
+      this.formData.restaurant_banner = file;
+      this.bannerUrl = URL.createObjectURL(file);
     },
     selectLogo(e) {
-      this.formData.restaurant_logo = e.target.files[0];
+      var file = e.target.files[0];
+      this.formData.restaurant_logo = file;
+      this.logoUrl = URL.createObjectURL(file);
     },
-    store(){
+    async store(){
       // store vue object to self veriable
       var self = this;
       var data = new FormData();
@@ -63,47 +67,38 @@ new Vue({
       data.append("restaurant_logo", self.formData.restaurant_logo);
       data.append("tags", tags);
       // send api post request to server
-      axios
-      .post(base_url + "restaurant/store", data)
-      .then(function({ data }) {
-          // if form validation done
-          if (data.check) {
-            // if data stored in server
-            if (data.success) {
-              // show success message
-              Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: "Restaurant created successfully",
-                  showConfirmButton: false,
-                  timer: 1500
-              });
-              location.reload();
-            }else {
-                // if not successfull
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong!"
-                });
-            }
-          } else {
-            self.errors = data.errors;
-          }
-      })
-      .catch(function(errors) {
-          console.log(errors);
-      });
-    },
-    fetchtags() {
-      var self = this;
-      axios
-      .get(base_url+'tag/allactivetags')
-      .then(function ({ data }) {
+      var {data} = await axios.post(base_url + "restaurant/store", data);
+      // if form validation done
+      if (data.check) {
+        // if data stored in server
         if (data.success) {
-          self.tags = data.data
+          // show success message
+          Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Restaurant created successfully",
+              showConfirmButton: false,
+              timer: 1500
+          });
+          window.close();
+        }else {
+            // if not successfull
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!"
+            });
         }
-      })
+      } else {
+        self.errors = data.errors;
+      }
+    },
+    async fetchtags() {
+      var self = this;
+      var {data} = await axios.get(base_url+'tag/allactivetags')
+      if (data.success) {
+        self.tags = data.data
+      }
     }
   },
   created() {

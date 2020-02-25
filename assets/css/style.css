@@ -105,7 +105,7 @@ i,
 }
 
 .custom-btn {
-    border: 1px solid #2dce89;
+    border: 1px solid;
     border-radius: 4px;
     padding: 3px 10px;
     margin: 0px !important;
@@ -116,7 +116,7 @@ i,
 
 .icon-list {
     position: absolute;
-    width: 60px;
+    width: 75px;
     right: 0;
     top: 0;
     right: -100%;
@@ -270,6 +270,13 @@ i,
     position: relative;
     transition: all 0.35s ease;
     overflow: hidden;
+}
+.banner-logo-upload-box img {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    top: 0;
+    left: 0;
 }
 .width-full{
     min-width: 100%;
@@ -660,4 +667,21 @@ i,
     position: absolute;
     right: 10px;
     top: 10px;
+}
+
+.ck-content {
+    min-height: 300px;
+}
+
+.tox .tox-editor-header {
+    z-index: 0 !important;
+}
+
+.tox-tinymce-aux {
+    position: relative !important;
+    z-index: 10055;
+}
+
+.multiselect {
+    min-height: 32px !important;
 }

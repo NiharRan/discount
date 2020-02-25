@@ -4,14 +4,22 @@
         <div class="col" style="margin-top: 108px;">
             <div class="card shadow">
                 <div class="card-header border-0">
-                    <h3 class="mb-0"><i class="fas fa-store"></i> Tag Lists
-                        <!-- Button trigger tag create modal -->
-                        <?php if($this->permission->has_permission('tag', 'create')) {?>
-                            <button type="button" class="btn btn-sm btn-primary float-right" @click="openModal('#tagCreateModal')" data-toggle="modal">
-                                <i class="fas fa-plus"></i> New
-                            </button>
-                        <?php }?>
-                    </h3>
+                    <div class="form-inline justify-content-between">
+                        <div class="form-group">
+                            <h3 class="mb-0"><i class="fas fa-tag"></i> Tag Lists</h3>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" @keyup="fetchtags" v-model="search" class="form-control" placeholder="Search">
+                        </div>
+                        <div class="form-group mx-sm-3">
+                            <!-- Button trigger tag create modal -->
+                            <?php if($this->permission->has_permission('tag', 'create')) {?>
+                                <button type="button" class="btn btn-sm btn-primary float-right" @click="openModal('#tagCreateModal')" data-toggle="modal">
+                                    <i class="fas fa-plus"></i> New
+                                </button>
+                            <?php }?>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- if tags is not empty -->
@@ -19,11 +27,12 @@
                         <!-- show all tags -->
                         <div class="flex-container">
                             <div class="flex-item" v-for="tag in tags" :key="tag.tag_id">
-                                <p class="custom-btn">
+                                <p class="custom-btn" :class="[ tag.tag_status == 1 ? 'btn-outline-success' : 'btn-outline-warning' ]">
                                     {{ tag.tag_name }}
                                     <span class="icon-list">
                                         <i class="fas fa-edit text-info" @click="edit(tag)"></i>
                                         <i class="fas fa-trash text-danger" @click="remove(tag.tag_id)"></i>
+                                        <i class="fas fa-eye text-warning" @click="changeStatus(tag)"></i>
                                     </span>
                                 </p>
                             </div>

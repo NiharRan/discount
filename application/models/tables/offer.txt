@@ -1,0 +1,18 @@
+Table: offers
+
+offer_id
+
+offer_name
+restaurant_id
+offer_discount
+offer_start
+offer_end
+template_id
+
+offer_description
+offer_barcode
+
+offer_status
+offer_created_at
+offer_modified_at
+offer_creator

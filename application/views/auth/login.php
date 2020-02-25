@@ -35,22 +35,9 @@ $remember = array(
 
 <div class="col-lg-5 col-md-7">
     <div class="card bg-secondary shadow border-0">
-        <div class="card-header bg-transparent pb-5">
-            <div class="text-muted text-center mt-2 mb-3"><small>Sign in with</small></div>
-            <div class="btn-wrapper text-center">
-            <a href="#" class="btn btn-neutral btn-icon">
-                <span class="btn-inner--icon"><img src="<?php echo base_url(); ?>assets/img/icons/common/github.svg"></span>
-                <span class="btn-inner--text">Github</span>
-            </a>
-            <a href="#" class="btn btn-neutral btn-icon">
-                <span class="btn-inner--icon"><img src="<?php echo base_url(); ?>assets/img/icons/common/google.svg"></span>
-                <span class="btn-inner--text">Google</span>
-            </a>
-            </div>
-        </div>
         <div class="card-body px-lg-5 py-lg-5">
             <div class="text-center text-muted mb-4">
-            <small>Or sign in with credentials</small>
+            <small>sign in with credentials</small>
             </div>
             <form role="form" action="<?php echo base_url(); ?>auth/login" autocomplete="off" method="post">
                 <div class="form-group mb-3">
@@ -87,7 +74,7 @@ $remember = array(
                 <a href="#" class="text-gray"><small>Forgot password?</small></a>
                 </div>
                 <div class="col-6 text-right">
-                <a href="<?php echo base_url(); ?>register" class="text-gray"><small>Create new account</small></a>
+                    <a href="<?php echo base_url(); ?>register" class="text-gray"><small>Create new account</small></a>
                 </div>
             </div>
         </div>

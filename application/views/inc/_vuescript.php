@@ -8,3 +8,7 @@
 <script src="<?php echo base_url(); ?>assets/vue/date-picker/luxon.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vue/date-picker/vue-datetime.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vue/date-picker/weekstart.min.js"></script>
+
+
+<script src="<?php echo base_url(); ?>assets/vue/vue-qrcode/vue-qrcode.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/croppie/dist/croppie.js"></script>

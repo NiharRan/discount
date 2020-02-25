@@ -11,6 +11,7 @@ class User extends CI_Controller {
 		$this->load->library('tank_auth');
 		$this->load->library('form_validation');
 		$this->load->helper('security');
+		$this->load->library('custom');
 		$this->load->library('permission');
 		$this->lang->load('tank_auth');
 		$this->load->model('user_model');
@@ -89,48 +90,115 @@ class User extends CI_Controller {
 		// create validation rules array
 		$rules = array(
 			array('field' => 'name', 'label' => 'User Name', 'rules' => 'required'),
-			array('field' => 'contact_number', 'label' => 'User Contact No.', 'rules' => 'required'),
-			array('field' => 'email', 'label' => 'User E-mail', 'rules' => 'required'),
 			array('field' => 'user_type', 'label' => 'User Type', 'rules' => 'required'),
+			array('field' => 'username', 'label' => 'Username', 'rules' => 'required'),
+			array('field' => 'password', 'label' => 'Password', 'rules' => 'required|min_length[6]'),
 		);
 		// set rules for validation
 		$this->form_validation->set_rules($rules);
 		// if validation is done & everything is valid
 		if ($this->form_validation->run()) {
-			// store user info
-			$data = array(
-				'name' => $this->input->post('name'),
-				'username' => $this->random_username(), // create unique username
-				'contact_number' => $this->input->post('contact_number'),
-				'email' => $this->input->post('email'),
-				'user_type' => $this->input->post('user_type'),
-				'activated' => 1,
-				'created' => date('Y-m-d'),
-				'password' => $this->tank_auth->create_password("123456")
-			);
-			// store user through user model
-			$id = $this->user_model->store($data);
+			$username = $this->input->post("username");
+			if (!$this->is_already_exists($username)) {
+				// store user info
+				$dob = empty($this->input->post('dob')) ? '' : $this->input->post('dob');
+				$jsonData['check'] = true;
+				$data = array(
+					'name'           => $this->input->post('name'),
+					'username'       => $username, 
+					'contact_number' => $this->input->post('contact_number'),
+					'email'          => $this->input->post('email'),
+					'user_type'      => $this->input->post('user_type'),
+					'city'           => $this->input->post('city'),
+					'country'        => $this->input->post('country'),
+					'address'        => $this->input->post('address'),
+					'dob'            => $dob,
+					'postal_code'    => $this->input->post('postal_code'),
+					'activated'      => 1,
+					'created'        => date('Y-m-d'),
+					'password'       => $this->tank_auth->create_password($this->input->post("password"))
+				);
+				// store user through user model
+				$id = $this->user_model->store($data);
 
-			if ($id) {
-				$jsonData['success'] = true;
+				if ($id) {
+					// if user banner is provided
+					if(isset($_FILES['banner']['name']) && $_FILES['banner']['name'] != ''){
+						$folder = 'user-'.$id;
+						$ext = pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION);
+						$file_name = 'banner-'.time().'.'.$ext;
+
+						$_FILES['banner']['name']=$file_name;
+						$path = './uploads/user/'.$folder;
+
+						// if directory not exists, create
+						if (!is_dir($path)) {
+							mkdir($path, 0777, true);
+						}
+						$config['upload_path'] 		= $path;
+						$config['allowed_types'] 	='*';
+						
+						// load upload library
+						$this->load->library('upload', $config);
+						// check image uploaded or not
+						if($this->upload->do_upload('banner')){
+							$uploadData = $this->upload->data();
+							// resize image
+							$query['path'] = $uploadData['full_path'];
+							$query['width'] = 1000;
+							$query['height'] = 600;
+							$this->resizeImage($query);
+
+							// update user info
+							$imageData = array(
+								'banner' => $file_name,
+							);
+							$this->db->where('id',$id);
+							$this->db->update('users',$imageData);
+						}
+					}
+
+					// if user avatar is provided
+					if(isset($_FILES['avatar']['name']) && $_FILES['avatar']['name'] != ''){
+						$folder = 'user-'.$id;
+						$ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+						$file_name = 'avatar-'.time().'.'.$ext;
+
+						$_FILES['avatar']['name']=$file_name;
+						$path = './uploads/user/'.$folder;
+
+						// if directory not exists, create
+						if (!is_dir($path)) {
+							mkdir($path, 0777, true);
+						}
+						$config['upload_path'] 		= $path;
+						$config['allowed_types'] 	='*';
+						
+						// load upload library
+						$this->load->library('upload', $config);
+						// check image uploaded or not
+						if($this->upload->do_upload('avatar')){
+							$uploadData = $this->upload->data();
+							// resize image
+							$query['path'] = $uploadData['full_path'];
+							$query['width'] = 200;
+							$query['height'] = 115;
+							$this->resizeImage($query);
+
+							// update user info
+							$imageData = array(
+								'avatar' => $file_name,
+							);
+							$this->db->where('id',$id);
+							$this->db->update('users',$imageData);
+						}
+					}
+					$jsonData['success'] = true;
+				}
+			} else {
+				$this->form_validation->set_message("username", "This username is already exists");
 			}
-
-			// if stored successfully return user id
-			// if($id) {
-			// 	// fetch user info using user id
-			// 	$userInfo = $this->user_model->fetch_user_info_by_id($id);
-			// 	$data['name'] = $userInfo->name;
-			// 	$data['username'] = $userInfo->username;
-			// 	$data['id'] = $userInfo->id;
-			// 	$data['new_email_key'] = $userInfo->new_email_key;
-			// 	$data['name'] = '123456';
-			// 	// then send email to user mail
-			// 	$result = $this->send_email($data);
-			// 	if ($result) {
-			// 		$jsonData['success'] = true;
-			// 	}
-			// }
-			else $jsonData['success'] = false;
+			
 		} else {
 			foreach ($_POST as $key => $value) {
 				$jsonData['errors'][$key] = strip_tags(form_error($key));
@@ -142,20 +210,222 @@ class User extends CI_Controller {
 	}
 
 	/**
-	 * this method create random username
-	 * from user name, contact_number and email
+	 * this method check user has permission to perform user action
+	 * @param action
+	 * @return	object
+	 */
+	function has_permission_to_action_user()
+	{
+		// intialize response data
+		$jsonData = array('success' => false);
+		$action = $this->input->post('action');
+		if ($this->permission->has_permission('user', $action)) {
+			$jsonData['success'] = true;
+		}
+		// send response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * user info update by this method. 
+	 * Return success TRUE if user info updated successfully
+	 * otherwise success FALSE.
+	 *
+	 * @param	
+	 * @return	object
+	 */
+	function update()
+	{
+		// response array
+		$jsonData = array('success' => false, 'check' => false, 'errors' => array());
+		// create validation rules array
+		$rules = array(
+			array('field' => 'name', 'label' => 'User Name', 'rules' => 'required'),
+			array('field' => 'user_type', 'label' => 'User Type', 'rules' => 'required'),
+			array('field' => 'username', 'label' => 'Username', 'rules' => 'required'),
+			array('field' => 'password', 'label' => 'Password', 'rules' => 'required|min_length[6]'),
+		);
+		// set rules for validation
+		$this->form_validation->set_rules($rules);
+		// if validation is done & everything is valid
+		if ($this->form_validation->run()) {
+			$id = $this->input->post("id");
+			$banner = $this->input->post('banner');
+			$avatar = $this->input->post('avatar');
+			$dob = empty($this->input->post('dob')) ? '' : $this->input->post('dob');
+
+			// update user info
+			$jsonData['check'] = true;
+			$data = array(
+				'name'           => $this->input->post('name'),
+				'contact_number' => $this->input->post('contact_number'),
+				'email'          => $this->input->post('email'),
+				'user_type'      => $this->input->post('user_type'),
+				'city'           => $this->input->post('city'),
+				'country'        => $this->input->post('country'),
+				'address'        => $this->input->post('address'),
+				'dob'            => $dob,
+				'postal_code'    => $this->input->post('postal_code'),
+			);
+			// update user through user model
+			$result = $this->user_model->update($data, $id);
+
+			if ($result) {
+				// if user banner is provided
+				if(isset($_FILES['new_banner']['name']) && $_FILES['new_banner']['name'] != ''){
+					$folder = 'user-'.$id;
+					$ext = pathinfo($_FILES['new_banner']['name'], PATHINFO_EXTENSION);
+					$banner_name = 'banner-'.time().'.'.$ext;
+					$banner_thumb_name = 'avatar-'.time().'_thumb.'.$ext;
+
+					$_FILES['new_banner']['name']=$banner_name;
+					$path = './uploads/user/'.$folder;
+
+					// old banner path
+					$oldBanner = $path.'/'.$banner;
+					$onlyName = substr($banner, 0, strpos($banner, '.'));
+					$oldBannerThumb = $path.'/'.$onlyName.'_thumb.'.$ext;
+					/**
+					 * check if old banner is exists
+					 * then delete first
+					 */
+					if (file_exists($oldBanner)) {
+						// give permission to delete
+						chmod($oldBanner, 0777);
+						unlink($oldBanner);
+					}
+					if (file_exists($oldBannerThumb)) {
+						// give permission to delete
+						chmod($oldBannerThumb, 0777);
+						unlink($oldBannerThumb);
+					}
+
+					// if directory not exists, create
+					if (!is_dir($path)) {
+						mkdir($path, 0777, true);
+					}
+					$config['upload_path'] 		= $path;
+					$config['allowed_types'] 	='*';
+					
+					// load upload library
+					$this->load->library('upload', $config);
+					// check image uploaded or not
+					if($this->upload->do_upload('new_banner')){
+						$uploadData = $this->upload->data();
+						// resize image
+						$query['path'] = $uploadData['full_path'];
+						$query['width'] = 1000;
+						$query['height'] = 600;
+						$this->resizeImage($query);
+
+						// update user info
+						$imageData = array(
+							'banner' => $banner_name,
+							'banner_thumb' => $banner_thumb_name,
+						);
+						$this->db->where('id',$id)->update('users',$imageData);
+					}
+				}
+
+				// if user avatar is provided
+				if(isset($_FILES['new_avatar']['name']) && $_FILES['new_avatar']['name'] != ''){
+					$folder = 'user-'.$id;
+					$ext = pathinfo($_FILES['new_avatar']['name'], PATHINFO_EXTENSION);
+					$avatar_name = 'avatar-'.time().'.'.$ext;
+					$avatar_thumb_name = 'avatar-'.time().'_thumb.'.$ext;
+
+					$_FILES['new_avatar']['name']=$avatar_name;
+					$path = './uploads/user/'.$folder;
+
+					// old Avatar path
+					$oldAvatar = $path.'/'.$avatar;
+					$onlyName = substr($avatar, 0, strpos($avatar, '.'));
+					$oldAvatarThumb = $path.'/'.$onlyName.'_thumb.'.$ext;
+					/**
+					 * check if old Avatar is exists
+					 * then delete first
+					 */
+					if (file_exists($oldAvatar)) {
+						// give permission to delete
+						chmod($oldAvatar, 0777);
+						unlink($oldAvatar);
+					}
+					if (file_exists($oldAvatarThumb)) {
+						// give permission to delete
+						chmod($oldAvatarThumb, 0777);
+						unlink($oldAvatarThumb);
+					}
+
+					// if directory not exists, create
+					if (!is_dir($path)) {
+						mkdir($path, 0777, true);
+					}
+					$config['upload_path'] 		= $path;
+					$config['allowed_types'] 	='*';
+					
+					// load upload library
+					$this->load->library('upload', $config);
+					// check image uploaded or not
+					if($this->upload->do_upload('new_avatar')){
+						$uploadData = $this->upload->data();
+						// resize image
+						$query['path'] = $uploadData['full_path'];
+						$query['width'] = 200;
+						$query['height'] = 115;
+						$this->resizeImage($query);
+
+						// update user info
+						$imageData = array(
+							'avatar' => $avatar_name,
+							'avatar_thumb' => $avatar_thumb_name,
+						);
+						$this->db->where('id',$id)->update('users',$imageData);
+					}
+				}
+				$jsonData['success'] = true;
+			}
+			
+		} else {
+			foreach ($_POST as $key => $value) {
+				$jsonData['errors'][$key] = strip_tags(form_error($key));
+			}
+		}
+		
+		// send the response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * this method resize image 
+	 * @param array [path, width, height]
+	 * @return boolean
+	 */
+	function resizeImage($data)
+	{
+		$cropConfig['image_library'] = 'gd2';
+		$cropConfig['source_image'] = $data['path'];
+		$cropConfig['create_thumb'] = TRUE;
+		$cropConfig['maintain_ratio'] = TRUE;
+		$cropConfig['width']         = $data['width'];
+		$cropConfig['height']       = $data['height'];
+
+		$this->load->library('image_lib');
+		$this->image_lib->initialize($cropConfig);
+		$this->image_lib->resize();
+		$this->image_lib->clear();
+	}
+
+	/**
+	 * this method check username is already used or not
+	 * from user name
 	 * @return string username
 	 */
-	function random_username()
+	function is_already_exists($username, $user_id = '')
 	{
-		$characters = $this->input->post('name')
-					 .$this->input->post('contact_number')
-					 .$this->input->post('email');
-		$username = "";
-    	for($i = 0; $i < 6; $i++){
-        	$username .= $characters[mt_rand(0,strlen($characters) - 1)];
-        }
-        return $username;
+		$user = $this->user_model->fetch_user_info_on_condition(array('username' => $username));
+		if ($user_id == '' && count($user) > 0) return true;
+		if($user_id != '' && count($user) > 0 && $user['id'] != $user_id) return true;
+		return false;
 	}
 
 	/**
@@ -191,9 +461,9 @@ class User extends CI_Controller {
 		$jsonData = array('success' => false, 'data' => array());
 		$usertypes = $this->user_model->fetch_all_active_user_types();
 		// if usertypes table is not empty
-		if ($usertypes->num_rows() > 0) {
+		if (count($usertypes) > 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $usertypes->result();
+			$jsonData['data'] = $usertypes;
 		}
 
 		// send response to clint
@@ -237,59 +507,59 @@ class User extends CI_Controller {
 		 *   data => userlist
 		 * 	 links => pagination links
 		 */
-		if ($users->num_rows() > 0) {
+		if (count($users )> 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $users->result();
-			$jsonData['links'] = $this->paginate($obj);
+			$jsonData['data'] = $users;
+			$jsonData['links'] = $this->custom->paginate($obj);
 		}
 		// responde send
 		echo json_encode($jsonData);
 	}
 
-	function paginate($obj)
+	/**
+	 * user status change by this method. 
+	 * if status change
+	 * Return success true 
+	 * otherwise false.
+	 *
+	 * @return	true/false
+	 */
+	function changestatus()
 	{
-		// integrate bootstrap pagination
-        $config['full_tag_open'] = '<ul class="pagination justify-content-end mb-0">';
-		$config['full_tag_close'] = '</ul>';
-		
-		$config['first_tag_open'] = '<li class="page-item">';
-		$config['first_link'] = '<i class="fas fa-angle-left"></i>';
-		$config['first_tag_close'] = '</li>';
-		
-		$config['next_tag_open'] = '<li class="page-item">';
-		$config['next_link'] = '<i class="fas fa-angle-double-right"></i>';
-		$config['next_tag_close'] = '</li>';
-		
-		$config['prev_tag_open'] = '<li class="page-item">';
-		$config['prev_link'] = '<i class="fas fa-angle-double-left"></i>';
-        $config['prev_tag_close'] = '</li>';
-        $config['num_tag_open'] = '<li class="page-item">';
-		$config['num_tag_close'] = '</li>';
-		
-		$config['last_tag_open'] = '<li class="page-item">';
-		$config['last_link'] = '<i class="fas fa-angle-right"></i>';
-		$config['last_tag_close'] = '</li>';
-		
-        $config['cur_tag_open'] = '<li class="active page-item"><span><b>';
-		$config['cur_tag_close'] = '</b></span></li>';
-		
-		// set these mostly...
-		$config['page_query_string'] = TRUE;
-		$config['query_string_segment'] = 'offset';
-		$config['reuse_query_string'] = TRUE;
+		// intialize response data
+		$jsonData = array('success' => false);
+		$activated = $this->input->post('activated');
+		$id = $this->input->post('id');
+		// change status through this method
+		$result = $this->user_model->change_status($activated, $id);
 
+		// if status changed 
+		if ($result) {
+			$jsonData['success'] = true;
+		}
+		// send response to client
+		echo json_encode($jsonData);
+	}
 
-		// custom config
-		$config['base_url'] = $obj['base_url'];
-		$config['total_rows'] = $obj['total_rows'];
-		$config['per_page'] = $obj['per_page'];
-		$config['uri_segment'] = $obj['uri_segment'];
+	/**
+	 * user delete by this method. 
+	 * Return TRUE if deleted successfully
+	 * otherwise FALSE.
+	 *
+	 * @param user_id
+	 * @return	bool
+	 */
+	function delete($user_id)
+	{
+		// response array
+		$jsonData = array('success' => false);
+		$result = $this->user_model->remove($user_id);
+		// if user deleted successfully
+		if($result) {
+			$jsonData['success'] = true;
+		}
 
-		// link tag class [ <a href="#" class="page-link"></a>]
-		$config['attributes'] = array('class' => 'page-link');
-
-		$this->pagination->initialize($config);
-		// return pagination links
-		return $this->pagination->create_links();
+		// send response to clint
+		echo json_encode($jsonData);
 	}
 }

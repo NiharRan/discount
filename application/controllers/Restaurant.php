@@ -32,7 +32,7 @@ class Restaurant extends CI_Controller {
 			redirect('/auth/login/');
 		} else {
             // this is the page title
-			$data['title'] = 'Offer.com || Users';
+			$data['title'] = 'Offer.com || Restaurants';
 			$data['user_id']	= $this->tank_auth->get_user_id();
 			$data['username']	= $this->tank_auth->get_username();
             
@@ -40,33 +40,12 @@ class Restaurant extends CI_Controller {
 			$data['extrastyle'] = 'inc/_vuestyle';
 			$data['extrascript'] = 'inc/_vuescript';
 			$data['vuecomponent'] = 'components/restaurant/list';
+
+			// editor cdn src
+			$data['editor'] = 'plugins/ckeditor5/ckeditor'; 
+			$data['editorVue'] = 'plugins/ckeditor5/ckeditor.min'; 
+
 			$data['content'] = 'admin/restaurant/list';
-			$this->load->view('layouts/master', $data);
-		}
-    }
-
-	/***
-	 * this method create new restaurant
-	 * @route {{ restaurants/create }}
-	 * @return restaurant info
-	 * using vue
-	 */
-	function profile()
-	{
-		if (!$this->tank_auth->is_logged_in()) {
-			redirect('/auth/login/');
-		} else {
-			$data['title'] = 'Offer.com || Restaurant List';
-			$data['user_id']	= $this->user_id;
-			$data['username']	= $this->username;
-
-			$data['restaurants'] = $this->restaurant_model->fetch_restaurants_by_user_info($this->user_id);
-			
-			// view page data
-			$data['extrastyle'] = 'inc/_vuestyle';
-			$data['extrascript'] = 'inc/_vuescript';
-			$data['vuecomponent'] = 'components/restaurant/edit';
-			$data['content'] = 'admin/restaurant/edit';
 			$this->load->view('layouts/master', $data);
 		}
     }
@@ -85,7 +64,7 @@ class Restaurant extends CI_Controller {
 		if (!$this->permission->has_permission('restaurant', 'create')) {
 			redirect($_SERVER['HTTP_REFERER']);
 		} else {
-			$data['title'] = 'Offer.com || Restaurant List';
+			$data['title'] = 'Offer.com || Create New Restaurant';
 			$data['user_id']	= $this->tank_auth->get_user_id();
 			$data['username']	= $this->tank_auth->get_username();
 			
@@ -175,6 +154,13 @@ class Restaurant extends CI_Controller {
 					$this->load->library('upload', $config);
 					// check image uploaded or not
 					if($this->upload->do_upload('restaurant_banner')){
+						$uploadData = $this->upload->data();
+						// resize image
+						$query['path'] = $uploadData['full_path'];
+						$query['width'] = 1000;
+						$query['height'] = 600;
+						$this->resizeImage($query);
+
 						// update restaurant info
 						$imageData = array(
 							'restaurant_banner' => $file_name,
@@ -204,6 +190,13 @@ class Restaurant extends CI_Controller {
 					$this->load->library('upload', $config);
 					// check image uploaded or not
 					if($this->upload->do_upload('restaurant_logo')){
+						$uploadData = $this->upload->data();
+						// resize image
+						$query['path'] = $uploadData['full_path'];
+						$query['width'] = 200;
+						$query['height'] = 115;
+						$this->resizeImage($query);
+
 						// update restaurant info
 						$imageData = array(
 							'restaurant_logo' => $file_name,
@@ -221,6 +214,27 @@ class Restaurant extends CI_Controller {
 		
 		// send the response to client
 		echo json_encode($jsonData);
+	}
+
+
+	/**
+	 * this method resize image 
+	 * @param array [path, width, height]
+	 * @return boolean
+	 */
+	function resizeImage($data)
+	{
+		$cropConfig['image_library'] = 'gd2';
+		$cropConfig['source_image'] = $data['path'];
+		$cropConfig['create_thumb'] = TRUE;
+		$cropConfig['maintain_ratio'] = TRUE;
+		$cropConfig['width']         = $data['width'];
+		$cropConfig['height']       = $data['height'];
+
+		$this->load->library('image_lib');
+		$this->image_lib->clear();
+		$this->image_lib->initialize($cropConfig);
+		$this->image_lib->resize();
 	}
 
 	/**
@@ -255,9 +269,9 @@ class Restaurant extends CI_Controller {
 		$jsonData = array('success' => false, 'data' => '');
 
 		// get restaurant slug from url
-		$slug = $this->uri->segment(3);
+		$query['restaurant_slug'] = $this->uri->segment(3);
 		// fetch restaurant info
-		$restaurant = $this->restaurant_model->fetch_restaurant_info_by_slug($slug);
+		$restaurant = $this->restaurant_model->fetch_restaurant_on_condition($query);
 
 		// if restaurant info found
 		if (count($restaurant) > 0) {
@@ -269,22 +283,22 @@ class Restaurant extends CI_Controller {
 	}
 
 	/**
-	 * this method check user has permission to edit restaurant
+	 * this method check user has permission to perform restaurant action
 	 * @param restaurant_id
 	 * @param restaurant_creator
 	 * @return	object
 	 */
-	function has_permission_to_edit_restaurant()
+	function has_permission_to_action_restaurant()
 	{
 		// intialize response data
 		$jsonData = array('success' => false);
-		$restaurant_creator = $this->input->post('restaurant_creator');
-		$restaurant_id = $this->input->post('restaurant_id');
+		$query['restaurant_creator'] = $this->input->post('restaurant_creator');
+		$query['restaurant_id'] = $this->input->post('restaurant_id');
 		$action = $this->input->post('action');
 		// fetch restaurant through this method
-		$data = $this->restaurant_model->fetch_restaurant_by_creator_and_id($restaurant_creator, $restaurant_id);
+		$data = $this->restaurant_model->fetch_restaurant_on_condition($query);
 		// if data found 
-		if ($data->num_rows() > 0) {
+		if (count($data) > 0 && $query['restaurant_creator'] == $this->user_id) {
 			if ($this->permission->has_permission('restaurant', $action)) {
 				$jsonData['success'] = true;
 			}
@@ -351,6 +365,8 @@ class Restaurant extends CI_Controller {
 
 				// old banner path
 				$oldBanner = $path.'/'.$restaurant_banner;
+				$onlyName = substr($restaurant_banner, 0, strpos($restaurant_banner, '.'));
+				$oldBannerThumb = $path.'/'.$onlyName.'_thumb.'.$ext;
 				/**
 				 * check if old banner is exists
 				 * then delete first
@@ -359,6 +375,11 @@ class Restaurant extends CI_Controller {
 					// give permission to delete
 					chmod($oldBanner, 0777);
 					unlink($oldBanner);
+				}
+				if (file_exists($oldBannerThumb)) {
+					// give permission to delete
+					chmod($oldBannerThumb, 0777);
+					unlink($oldBannerThumb);
 				}
 
 				// if directory not exists, create
@@ -372,6 +393,12 @@ class Restaurant extends CI_Controller {
 				$this->load->library('upload', $config);
 				// check image uploaded or not
 				if($this->upload->do_upload('restaurant_new_banner')){
+					$uploadData = $this->upload->data();
+					// resize image
+					$query['path'] = $uploadData['full_path'];
+					$query['width'] = 1000;
+					$query['height'] = 600;
+					$this->resizeImage($query);
 					// update restaurant info
 					$imageData = array(
 						'restaurant_banner' => $file_name,
@@ -392,14 +419,21 @@ class Restaurant extends CI_Controller {
 
 				// old logo path
 				$oldLogo = $path.'/'.$restaurant_logo;
+				$onlyName = substr($restaurant_logo, 0, strpos($restaurant_logo, '.'));
+				$oldLogoThumb = $path.'/'.$onlyName.'_thumb.'.$ext;
 				/**
-				 * check if old logo is exists
+				 * check if old Logo is exists
 				 * then delete first
 				 */
 				if (file_exists($oldLogo)) {
 					// give permission to delete
 					chmod($oldLogo, 0777);
 					unlink($oldLogo);
+				}
+				if (file_exists($oldLogoThumb)) {
+					// give permission to delete
+					chmod($oldLogoThumb, 0777);
+					unlink($oldLogoThumb);
 				}
 
 				// if directory not exists, create
@@ -413,6 +447,12 @@ class Restaurant extends CI_Controller {
 				$this->load->library('upload', $config);
 				// check image uploaded or not
 				if($this->upload->do_upload('restaurant_new_logo')){
+					$uploadData = $this->upload->data();
+					// resize image
+					$query['path'] = $uploadData['full_path'];
+					$query['width'] = 200;
+					$query['height'] = 115;
+					$this->resizeImage($query);
 					// update restaurant info
 					$imageData = array(
 						'restaurant_logo' => $file_name,
@@ -433,7 +473,6 @@ class Restaurant extends CI_Controller {
 				'restaurant_moto' => $this->input->post('restaurant_moto'),
 				'restaurant_email' => $this->input->post('restaurant_email'),
 				'restaurant_slug' => url_title($this->input->post('restaurant_name'), "dash", true),
-				'restaurant_created_at' => date('Y-m-d H:i:s'),
 				'restaurant_creator' => $this->session->userdata('user_id')
 			);
 			// update restaurant through restaurant model
@@ -568,7 +607,7 @@ class Restaurant extends CI_Controller {
 	 * Return success true 
 	 * otherwise false.
 	 *
-	 * @return	array[object] restaurantlist
+	 * @return	true/false
 	 */
 	function changestatus()
 	{
@@ -583,6 +622,30 @@ class Restaurant extends CI_Controller {
 		if ($result) {
 			$jsonData['success'] = true;
 		}
+		// send response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * all active restaurant created by user 
+	 * fetch by this method. 
+	 * @return restaurantlists.
+	 *
+	 */
+	function allactiverestaurants()
+	{
+		// intialize response data
+		$jsonData = array('success' => false, 'data' => array());
+		// logged in user's restaurants will be fetched this method
+		$restaurant_creator = $this->session->userdata('user_id');
+		$restaurants = $this->restaurant_model->fetch_all_active_restaurants_of_user($restaurant_creator);
+
+		// if restaurants fond
+		if (count($restaurants) > 0) {
+			$jsonData['success'] = true;
+			$jsonData['data'] = $restaurants;
+		}
+
 		// send response to client
 		echo json_encode($jsonData);
 	}
