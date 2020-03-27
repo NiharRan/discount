@@ -37,9 +37,9 @@
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                <a class="dropdown-item" v-if="hasPermission(template, 'edit')" href="#" @click="edit(template)"><i class="fas fa-edit text-info"></i> Edit</a>
-                                                <a class="dropdown-item" v-if="hasPermission(template, 'edit')" href="#" @click="changeStatus(template)"><i class="fas" :class="[template.template_status == 1 ? 'fa-times text-warning' : 'fa-check text-success' ]"></i> {{ template.template_status == 1 ? 'Inactive' : 'Active' }}</a>
-                                                <a class="dropdown-item" v-if="hasPermission(template, 'delete')" href="#" @click="remove(template.template_id)"><i class="fas fa-trash text-danger"></i> Delete</a>
+                                                <a class="dropdown-item" v-if="hasPermission('edit', 'template')" href="#" @click="edit(template)"><i class="fas fa-edit text-info"></i> Edit</a>
+                                                <a class="dropdown-item" v-if="hasPermission('edit', 'template')" href="#" @click="changeStatus(template)"><i class="fas" :class="[template.template_status == 1 ? 'fa-times text-warning' : 'fa-check text-success' ]"></i> {{ template.template_status == 1 ? 'Inactive' : 'Active' }}</a>
+                                                <a class="dropdown-item" v-if="hasPermission('delete', 'template')" href="#" @click="remove(template.template_id)"><i class="fas fa-trash text-danger"></i> Delete</a>
                                             </div>
                                         </div>
                                     </td>

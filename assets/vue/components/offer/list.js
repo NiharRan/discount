@@ -9,6 +9,7 @@ new Vue({
     options: [],
     links: '',
     offers: [],
+    userPermissions: [],
     offer: {},
     search: '',
     isloading: false,
@@ -18,27 +19,7 @@ new Vue({
     customTime(value) {
       return moment(value, 'hh:mm A').format('hh:mm A');
     },
-    async hasPermission(offer, action) {
-      /**
-       * check loggedin user has permission to edit offer
-       * @param offer_id
-       * @param offer_creator
-       * 
-       * @response true/false
-       */
-      var status = false;
-      var formData = new FormData();
-      formData.append('offer_id', offer.offer_id);
-      formData.append('offer_creator', offer.offer_creator);
-      formData.append('action', action);
-
-      var {data} = await axios.post(base_url+'offers/check-permission', formData);
-      // if status updated
-      if (data.success) {
-        status = true;
-      }
-      return status;
-    },
+    
     preview(offer) {
       this.offer = offer;
       $('#previewModal').modal('show');
@@ -99,10 +80,34 @@ new Vue({
         self.links = data.links
       }
     },
+    async authPermissions() {
+      var response = await axios.get(base_url+'auth/permissions');
+      if (response.status === 200) {
+        this.userPermissions = response.data.data;
+      }
+    },
+    async hasPermission(action, model_name) {
+      /**
+       * check loggedin user has permission to action user
+       * @param action
+       * 
+       * @response true/false
+       */
+      var status = false;
+      var data = await this.userPermissions.find((permission) => {
+        return permission.action === action && permission.model_name === model_name;
+      });
+      // if status updated
+      if (data !== null) {
+        status = true;
+      }
+      return status;
+    },
   },
   created() {
     // after page is created call those method
     this.fetchoffers();
+    this.authPermissions();
 
     var self = this;
     // if click on pagination link icon

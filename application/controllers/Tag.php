@@ -217,7 +217,7 @@ class Tag extends CI_Controller {
 	 *
 	 * @return	true/false
 	 */
-	function changestatus()
+	function changeStatus()
 	{
 		// intialize response data
 		$jsonData = array('success' => false);

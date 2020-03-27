@@ -30,9 +30,9 @@
                                 <p class="custom-btn" :class="[ tag.tag_status == 1 ? 'btn-outline-success' : 'btn-outline-warning' ]">
                                     {{ tag.tag_name }}
                                     <span class="icon-list">
-                                        <i class="fas fa-edit text-info" @click="edit(tag)"></i>
-                                        <i class="fas fa-trash text-danger" @click="remove(tag.tag_id)"></i>
-                                        <i class="fas fa-eye text-warning" @click="changeStatus(tag)"></i>
+                                        <i v-if="hasPermission('edit', 'tag')" class="fas fa-edit text-info" @click="edit(tag)"></i>
+                                        <i v-if="hasPermission('delete', 'tag')" class="fas fa-trash text-danger" @click="remove(tag.tag_id)"></i>
+                                        <i v-if="hasPermission('edit', 'tag')" class="fas fa-eye text-warning" @click="changeStatus(tag)"></i>
                                     </span>
                                 </p>
                             </div>

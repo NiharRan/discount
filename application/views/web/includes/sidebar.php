@@ -5,7 +5,7 @@
             <ul>
                 <?php
                 if (count($popularTags) > 0) {
-                    foreach ($tags as $tag) {
+                    foreach ($popularTags as $tag) {
                         echo '<li><a href="'.base_url().'web/category/'.$tag['tag_slug'].'">'.$tag['tag_name'].'</a></li>';
                     }
                 } else {

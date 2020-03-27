@@ -1,12 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Restaurant_Model
- *
- * This model store restaurant data. It operates the following tables:
- * - restaurant table data
- *
- */
+
 class Restaurant_Model extends CI_Model
 {
 	private $table			= 'restaurants';			// restaurant table

@@ -1,12 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Rating_Model
- *
- * This model store rating data. It operates the following tables:
- * - rating table data
- *
- */
+
 class Rating_Model extends CI_Model
 {
 	private $table			= 'ratings';			// rating table

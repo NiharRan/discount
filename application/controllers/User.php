@@ -80,7 +80,7 @@ class User extends CI_Controller {
 	 * Return TRUE if user info stored successfully
 	 * otherwise FALSE.
 	 *
-	 * @param	stringArray	{{name, contact_number, email, user_type}}
+	 * @param	stringArray	{{name, contact_number, email, role}}
 	 * @return	object
 	 */
 	function store()
@@ -90,7 +90,7 @@ class User extends CI_Controller {
 		// create validation rules array
 		$rules = array(
 			array('field' => 'name', 'label' => 'User Name', 'rules' => 'required'),
-			array('field' => 'user_type', 'label' => 'User Type', 'rules' => 'required'),
+			array('field' => 'role', 'label' => 'User Type', 'rules' => 'required'),
 			array('field' => 'username', 'label' => 'Username', 'rules' => 'required'),
 			array('field' => 'password', 'label' => 'Password', 'rules' => 'required|min_length[6]'),
 		);
@@ -108,7 +108,7 @@ class User extends CI_Controller {
 					'username'       => $username, 
 					'contact_number' => $this->input->post('contact_number'),
 					'email'          => $this->input->post('email'),
-					'user_type'      => $this->input->post('user_type'),
+					'role'      => $this->input->post('role'),
 					'city'           => $this->input->post('city'),
 					'country'        => $this->input->post('country'),
 					'address'        => $this->input->post('address'),
@@ -241,7 +241,7 @@ class User extends CI_Controller {
 		// create validation rules array
 		$rules = array(
 			array('field' => 'name', 'label' => 'User Name', 'rules' => 'required'),
-			array('field' => 'user_type', 'label' => 'User Type', 'rules' => 'required'),
+			array('field' => 'role', 'label' => 'User Type', 'rules' => 'required'),
 			array('field' => 'username', 'label' => 'Username', 'rules' => 'required'),
 			array('field' => 'password', 'label' => 'Password', 'rules' => 'required|min_length[6]'),
 		);
@@ -260,7 +260,7 @@ class User extends CI_Controller {
 				'name'           => $this->input->post('name'),
 				'contact_number' => $this->input->post('contact_number'),
 				'email'          => $this->input->post('email'),
-				'user_type'      => $this->input->post('user_type'),
+				'role'      => $this->input->post('role'),
 				'city'           => $this->input->post('city'),
 				'country'        => $this->input->post('country'),
 				'address'        => $this->input->post('address'),
@@ -459,7 +459,7 @@ class User extends CI_Controller {
 	{
 		// response array
 		$jsonData = array('success' => false, 'data' => array());
-		$usertypes = $this->user_model->fetch_all_active_user_types();
+		$usertypes = $this->user_model->fetch_all_active_roles();
 		// if usertypes table is not empty
 		if (count($usertypes) > 0) {
 			$jsonData['success'] = true;

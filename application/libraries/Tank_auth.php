@@ -73,7 +73,7 @@ class Tank_auth
 								'username'	=> $user->username,
 								'name'	=> $user->name,
 								'avatar'	=> $user->avatar,
-								'user_type'	=> $user->user_type,
+								'role'	=> $user->role,
 								'email'	=> $user->email,
 								'status'	=> ($user->activated == 1) ? STATUS_ACTIVATED : STATUS_NOT_ACTIVATED,
 						));

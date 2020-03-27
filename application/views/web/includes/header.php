@@ -19,4 +19,16 @@
                 </div>
             </div>
         </div> <!-- END .header -->
+
+        <div class="site-navigation">
+            <div class="container">
+                <nav class="primary-navigation clearfix fleft">
+                    <ul class="st-menu wpc-menu">
+                        <li><a href="#"><i class="unordered list icon"></i> Browse Coupons</a> </li>
+                        <li><a href="#">Stores</a> </li>
+                        <li><a href="#">Categories</a></li>
+                    </ul>
+                </nav> <!-- END .primary-navigation -->
+            </div> <!-- END .container -->
+        </div>
     </header><!-- END #masthead -->

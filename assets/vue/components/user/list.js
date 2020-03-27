@@ -9,35 +9,18 @@ new Vue({
     avatarUrl: base_url+"uploads/default/user/default-avatar.jpg",
     usertypes: [],
     users: [],
+    userPermissions: [],
     links: '',
     search: '',
     errors: {
       name: '',
       username: '',
-      user_type: ''
+      role: ''
     },
     isloading: false,
   },
 
   methods: {
-    async hasPermission(action) {
-      /**
-       * check loggedin user has permission to edit user
-       * @param action
-       * 
-       * @response true/false
-       */
-      var status = false;
-      var formData = new FormData();
-      formData.append('action', action);
-
-      var {data} = await axios.post(base_url+'user/check-permission', formData);
-      // if status updated
-      if (data.success) {
-        status = true;
-      }
-      return status;
-    },
     openModal(modalName) {
       // this method open modal which is id/class send by as param [modalName]
       $(modalName).modal('show');
@@ -58,12 +41,12 @@ new Vue({
       var data = new FormData();
       var dob = self.formData.dob == "0000-00-00" ? "" : moment(self.formData.dob).format('YYYY-MM-DD');
       // add user info to formData object
-      var user_type = typeof this.formData.user_type == "object" ? this.formData.user_type.user_type_id : this.formData.user_type;
+      var role = typeof this.formData.role == "object" ? this.formData.role.role_id : this.formData.role;
       data.append("name", this.formData.name);
       data.append("id", this.formData.id);
       data.append("contact_number", this.formData.contact_number);
       data.append("email", this.formData.email);
-      data.append("user_type", user_type);
+      data.append("role", role);
       data.append("city", this.formData.city);
       data.append("country", this.formData.country);
       data.append("postal_code", this.formData.postal_code);
@@ -136,7 +119,7 @@ new Vue({
     openUserEditModel (user) {
       this.formData = user;
       var userType = this.usertypes.find(function (type) {
-        return user.user_type === type.user_type_id;
+        return user.role === type.role_id;
       })
       if (user.banner != '') {
         this.bannerUrl = base_url + 'uploads/user/user-'+user.id+'/'+user.banner;
@@ -144,7 +127,7 @@ new Vue({
       if (user.avatar != '') {
         this.avatarUrl = base_url + 'uploads/user/user-'+user.id+'/'+user.avatar;
       }
-      this.formData.user_type = userType;
+      this.formData.role = userType;
       $('#userEditModal').modal('show');
       this.isloading = true;
       var self = this;
@@ -229,11 +212,36 @@ new Vue({
         });
       }
     },
+
+    async authPermissions() {
+      var response = await axios.get(base_url+'auth/permissions');
+      if (response.status === 200) {
+        this.userPermissions = response.data.data;
+      }
+    },
+    async hasPermission(action, model_name) {
+      /**
+       * check loggedin user has permission to action user
+       * @param action
+       * 
+       * @response true/false
+       */
+      var status = false;
+      var data = await this.userPermissions.find((permission) => {
+        return permission.action === action && permission.model_name === model_name;
+      });
+      // if status updated
+      if (data !== null) {
+        status = true;
+      }
+      return status;
+    },
   },
   created() {
     // after page is created call those method
     this.fetchusers();
     this.fetchusertypes();
+    this.authPermissions();
 
     var self = this;
     // if click on pagination link icon

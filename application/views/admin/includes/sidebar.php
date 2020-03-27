@@ -84,15 +84,42 @@
           </ul>
           <h6 class="navbar-heading text-muted">Setting</h6>
           <ul class="navbar-nav mb-md-3">
-            <!-- if user has permission to view resturant list -->
-            <?php if($this->permission->has_permission('resturant', 'list-view')) {?>
+
+          <!-- if user has role to view role list -->
+          <?php if($this->permission->has_permission('role', 'list-view')) {?>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo base_url(); ?>settings/resturants">
-              <i class="fas fa-store text-green"></i> Resturants
+              <a class="nav-link" href="<?php echo base_url(); ?>settings/roles">
+              <i class="fas fa-store text-green"></i> Roles
               </a>
             </li>
             <?php }?>
             
+           <!-- if user has permission to view permission list -->
+           <?php if($this->permission->has_permission('permission', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>settings/permissions">
+              <i class="fas fa-store text-green"></i> Permissions
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view restaurant list -->
+            <?php if($this->permission->has_permission('restaurant', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>settings/restaurants">
+              <i class="fas fa-store text-green"></i> Restaurants
+              </a>
+            </li>
+            <?php }?>
+            
+            <!-- if user has permission to view tag list -->
+            <?php if($this->permission->has_permission('feature-restaurant', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>settings/feature-restaurants">
+              <i class="fas fa-tag text-green"></i> Feature Restaurants
+              </a>
+            </li>
+            <?php }?>
 
             <!-- if user has permission to view tag list -->
             <?php if($this->permission->has_permission('tag', 'list-view')) {?>
@@ -108,6 +135,45 @@
             <li class="nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>settings/templates">
               <i class="fas fa-tag text-green"></i> Templates
+              </a>
+            </li>
+            <?php }?>
+          </ul>
+
+          <h6 class="navbar-heading text-muted">Menu</h6>
+          <ul class="navbar-nav mb-md-3">
+            <!-- if user has permission to view menu-category list -->
+            <?php if($this->permission->has_permission('menu-category', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/categories">
+              <i class="fas fa-store text-green"></i> Categories
+              </a>
+            </li>
+            <?php }?>
+            
+            <!-- if user has permission to view menu-tag list -->
+            <?php if($this->permission->has_permission('menu-tag', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/tags">
+              <i class="fas fa-tag text-green"></i> Tags
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view menu-food-size list -->
+            <?php if($this->permission->has_permission('menu-food-size', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/food-sizes">
+              <i class="fas fa-tag text-green"></i> Sizes
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view menu-food list -->
+            <?php if($this->permission->has_permission('menu-food', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/foods">
+              <i class="fas fa-tag text-green"></i> Foods
               </a>
             </li>
             <?php }?>

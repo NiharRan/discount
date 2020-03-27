@@ -10,6 +10,7 @@ new Vue({
     },
     options: [],
     tags: [],
+    userPermissions: [],
     links: '',
     tagStatus: [],
     tag_status: '',
@@ -221,10 +222,34 @@ new Vue({
         });
       }
     },
+    async authPermissions() {
+      var response = await axios.get(base_url+'auth/permissions');
+      if (response.status === 200) {
+        this.userPermissions = response.data.data;
+      }
+    },
+    async hasPermission(action, model_name) {
+      /**
+       * check loggedin user has permission to action user
+       * @param action
+       * 
+       * @response true/false
+       */
+      var status = false;
+      var data = await this.userPermissions.find((permission) => {
+        return permission.action === action && permission.model_name === model_name;
+      });
+      // if status updated
+      if (data !== null) {
+        status = true;
+      }
+      return status;
+    },
   },
   created() {
     // after page is created call those method
     this.fetchtags();
+    this.authPermissions();
 
     var self = this;
     // if click on pagination link icon

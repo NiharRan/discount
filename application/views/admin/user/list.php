@@ -43,7 +43,7 @@
                                         </div>
                                     </th>
                                     <td>{{ user.username }}</td>
-                                    <td>{{ user.user_type_name }}</td>
+                                    <td>{{ user.role_name }}</td>
                                     <td>{{ user.contact_number }}</td>
                                     <td>{{ user.email }}</td>
                                     <td><span class="badge" :class="[ user.activated == 1 ? 'badge-success' : 'badge-danger']">{{ user.activated == 1 ? 'Active' : 'Inactive' }}</span></td>
@@ -53,10 +53,10 @@
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                <a class="dropdown-item" @click="openUserEditModel(user)"><i class="fas fa-edit text-info"></i> Edit</a>
-                                                <a class="dropdown-item" href="#" @click="remove(user.id)"><i class="fas fa-trash text-danger"></i> Remove</a>
+                                                <a class="dropdown-item" v-if="hasPermission('edit', 'user')" @click="openUserEditModel(user)"><i class="fas fa-edit text-info"></i> Edit</a>
+                                                <a class="dropdown-item" v-if="hasPermission('delete', 'user')" href="#" @click="remove(user.id)"><i class="fas fa-trash text-danger"></i> Remove</a>
                                                 <a class="dropdown-item" 
-                                                    v-if="hasPermission(user, 'edit')" 
+                                                    v-if="hasPermission('edit', 'user')" 
                                                     href="#" 
                                                     @click="changeStatus(user)">
                                                         <i  class="fas" 
@@ -127,19 +127,19 @@
                                         <div class="form-group">
                                             <label class="form-control-label">User Type</label>
                                             <multiselect 
-                                                v-model="formData.user_type" 
+                                                v-model="formData.role" 
                                                 :options="usertypes" 
                                                 :close-on-select="true" 
                                                 :clear-on-select="true" 
                                                 :preserve-search="true" 
                                                 placeholder="Select User Type"
-                                                label="user_type_name" 
-                                                track-by="user_type_name" 
+                                                label="role_name" 
+                                                track-by="role_name" 
                                                 :preselect-first="false"
                                             >
                                             </multiselect>
-                                            <!-- if user_type field is empty and try to submit show error message -->
-                                            <small class="text-danger">{{ errors.user_type }}</small>
+                                            <!-- if role field is empty and try to submit show error message -->
+                                            <small class="text-danger">{{ errors.role }}</small>
                                         </div>
                                     </div>
 

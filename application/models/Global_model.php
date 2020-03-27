@@ -1,13 +1,7 @@
 
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Restaurant_Model
- *
- * This model store restaurant data. It operates the following tables:
- * - restaurant table data
- *
- */
+
 class Global_Model extends CI_Model
 {
 
@@ -37,6 +31,23 @@ class Global_Model extends CI_Model
 						->get()
                         ->result_array();
         return count($query) == 1 ? $query[0] : $query;
+	}
+
+	/**
+	 * this method fetch only object by primary key
+	 * @param table, primary_key, value
+	 * @return object
+	 */
+	function has_one($table, $primary_key, $value)
+	{
+		$query = $this->db->select('*')
+						->from($table)
+						->where(array(
+							$primary_key => $value,
+						))
+						->get()
+                        ->row();
+        return $query;
 	}
 
 	/**

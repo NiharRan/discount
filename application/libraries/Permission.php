@@ -27,7 +27,7 @@ class Permission
 			'model_name' => $model,
 			'action' => $action,
 			'permission_status' => 1,
-			'role_id' => $this->ci->session->userdata('user_type')
+			'role_id' => $this->ci->session->userdata('role')
 		))->get();
 
 		return $query->num_rows() > 0;

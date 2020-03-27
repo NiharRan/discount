@@ -8,11 +8,11 @@
                 foreach ($restaurants as $restaurant) { ?>
                 <div class="column">
                     <div class="store-thumb">
-                        <a href="<?php echo base_url(); ?>web/restaurants/<?php echo $restaurant['restaurant_slug']; ?>">
+                        <a href="<?php echo base_url(); ?>web/restaurant/<?php echo $restaurant['restaurant_slug']; ?>">
                             <img src="<?php echo base_url(); ?>uploads/restaurant/restaurant-<?php echo $restaurant['restaurant_id'];?>/<?php echo $restaurant['restaurant_logo']; ?>" alt="<?php echo $restaurant['restaurant_name']; ?>">
                         </a>
                     </div>
-                    <div class="store-name"><a href="<?php echo base_url(); ?>web/restaurants/<?php echo $restaurant['restaurant_slug']; ?>"><?php echo $restaurant['restaurant_name']; ?></a></div>
+                    <div class="store-name"><a href="<?php echo base_url(); ?>web/restaurant/<?php echo $restaurant['restaurant_slug']; ?>"><?php echo $restaurant['restaurant_name']; ?></a></div>
                 </div>
             <?php }
             }

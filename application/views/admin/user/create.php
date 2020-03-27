@@ -42,19 +42,19 @@
                                         <div class="form-group">
                                             <label class="form-control-label">User Type</label>
                                             <multiselect 
-                                                v-model="formData.user_type" 
+                                                v-model="formData.role" 
                                                 :options="usertypes" 
                                                 :close-on-select="true" 
                                                 :clear-on-select="true" 
                                                 :preserve-search="true" 
                                                 placeholder="Select User Type"
-                                                label="user_type_name" 
-                                                track-by="user_type_name" 
+                                                label="role_name" 
+                                                track-by="role_name" 
                                                 :preselect-first="false"
                                             >
                                             </multiselect>
-                                            <!-- if user_type field is empty and try to submit show error message -->
-                                            <small class="text-danger">{{ errors.user_type }}</small>
+                                            <!-- if role field is empty and try to submit show error message -->
+                                            <small class="text-danger">{{ errors.role }}</small>
                                         </div>
                                     </div>
 

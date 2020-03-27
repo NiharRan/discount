@@ -70,12 +70,12 @@
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                         <a 
                                             class="dropdown-item" 
-                                            v-if="hasPermission(offer, 'edit')" 
+                                            v-if="hasPermission('edit', 'offer')" 
                                             href="#"
                                             @click="preview(offer)">
                                                 <i class="fas fa-edit text-primary"></i> Edit
                                         </a>
-                                        <a class="dropdown-item" v-if="hasPermission(offer, 'edit')" href="#" @click="changeStatus(offer)"><i class="fas" :class="[offer.offer_status == 1 ? 'fa-times text-danger' : 'fa-check text-success' ]"></i> {{ offer.offer_status == 1 ? 'Inactive' : 'Active' }}</a>
+                                        <a class="dropdown-item" v-if="hasPermission('edit', 'offer')" href="#" @click="changeStatus(offer)"><i class="fas" :class="[offer.offer_status == 1 ? 'fa-times text-danger' : 'fa-check text-success' ]"></i> {{ offer.offer_status == 1 ? 'Inactive' : 'Active' }}</a>
                                     </div>
                                 </div>
                             </td>

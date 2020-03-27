@@ -1,12 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Tag_Model
- *
- * This model store tag data. It operates the following tables:
- * - tag table data
- *
- */
+
 class Tag_Model extends CI_Model
 {
 	private $table			= 'tags';			// tag table

@@ -1,12 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Template_Model
- *
- * This model store template data. It operates the following tables:
- * - template table data
- *
- */
 class Template_Model extends CI_Model
 {
 	private $table			= 'templates';			// template table

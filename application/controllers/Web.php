@@ -81,6 +81,23 @@ class Web extends CI_Controller {
         $this->load->view('layouts/web', $data);
 	}
 
+	function searchOfferByRestaurantAndTag()
+	{
+		$query['restaurant'] = isset($_REQUEST['restaurant']) ? $_REQUEST['restaurant'] : '';
+		$query['tag'] = isset($_REQUEST['tag']) ? $_REQUEST['tag'] : '';
+		$query['perpage'] = 10;
+		$query['base_url'] = site_url('web/offers/search/?restaurant='.$query['restaurant'].'&tag='.$query['tag']);
+
+		$data['offers'] = $this->offers($query);
+
+		$data['offerSlider'] = 'web/includes/slider';
+        $data['popularOffer'] = 'web/includes/popular-offer';
+        $data['mostPopularCategories'] = 'web/includes/most-popular-categories';
+        $data['mobileApp'] = 'web/includes/mobile-app';
+        $data['content'] = 'web/home';
+        $this->load->view('layouts/web', $data);
+	}
+
 
 	function offersOfRestaurant()
 	{

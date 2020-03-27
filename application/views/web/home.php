@@ -61,6 +61,10 @@
                     
                 }
                 ?>
+
+                <!-- <div class="store-listing-item shadow-box" style="float:right">
+                    <a href="<?php echo base_url(); ?>web/offers/search" class="btn btn-warning" style="float: left;padding: 5px 10px;">Read More</a>
+                </div> -->
             </div>
 
             <div class="store-page-links">

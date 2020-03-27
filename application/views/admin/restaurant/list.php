@@ -75,7 +75,7 @@
                                         
                                         <a 
                                             class="dropdown-item" 
-                                            v-if="hasPermission(restaurant, 'edit')" 
+                                            v-if="hasPermission('edit', 'restaurant')" 
                                             target="_blank" 
                                             :href="'<?php echo site_url('restaurants/'); ?>'+restaurant.restaurant_slug">
                                                 <i class="fas fa-edit text-primary"></i> Edit
@@ -86,7 +86,7 @@
                                             <i class="fas fa-eye text-info"></i> Preview
                                         </a>
                                         <a class="dropdown-item" 
-                                            v-if="hasPermission(restaurant, 'edit')" 
+                                            v-if="hasPermission('edit', 'restaurant')" 
                                             href="#" 
                                             @click="changeStatus(restaurant)">
                                                 <i  class="fas" 
@@ -94,7 +94,7 @@
                                                 </i> {{ restaurant.restaurant_status == 1 ? 'Inactive' : 'Active' }}
                                         </a>
                                         <a class="dropdown-item"
-                                           href="#" @click="openOfferModal(restaurant)">
+                                           href="#" v-if="hasPermission('create', 'offer')" @click="openOfferModal(restaurant)">
                                             <i class="fas fa-plus text-teal" ></i> 
                                             Create Offer
                                         </a>

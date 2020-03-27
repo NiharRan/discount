@@ -7,7 +7,7 @@ new Vue({
       name: '',
       contact_number: '',
       email: '',
-      user_type: '',
+      role: '',
       address: '',
       dob: "",
       city: "",
@@ -26,7 +26,7 @@ new Vue({
         name: "",
         contact_number: "",
         email: "",
-        user_type: "",
+        role: "",
         confirm_password: "",
     },
     isloading: false,
@@ -51,11 +51,11 @@ new Vue({
         // user date of birth
         var dob = self.formData.dob == "" ? "" : moment(this.formData.dob).format("YYYY-MM-DD");
         // add user info to formData object
-        var user_type = typeof this.formData.user_type == "object" ? this.formData.user_type.user_type_id : this.formData.user_type;
+        var role = typeof this.formData.role == "object" ? this.formData.role.role_id : this.formData.role;
         data.append("name", this.formData.name);
         data.append("contact_number", this.formData.contact_number);
         data.append("email", this.formData.email);
-        data.append("user_type", user_type);
+        data.append("role", role);
         data.append("city", this.formData.city);
         data.append("country", this.formData.country);
         data.append("postal_code", this.formData.postal_code);

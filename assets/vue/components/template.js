@@ -10,6 +10,7 @@ new Vue({
     },
     options: [],
     templates: [],
+    userPermissions: [],
     links: '',
     templateStatus: [],
     template_status: '',
@@ -160,23 +161,25 @@ new Vue({
         }
       }
     },
-    async hasPermission(template, action) {
+    async authPermissions() {
+      var response = await axios.get(base_url+'auth/permissions');
+      if (response.status === 200) {
+        this.userPermissions = response.data.data;
+      }
+    },
+    async hasPermission(action, model_name) {
       /**
-       * check loggedin user has permission to edit template
-       * @param template_id
-       * @param template_creator
+       * check loggedin user has permission to action user
+       * @param action
        * 
        * @response true/false
        */
       var status = false;
-      var formData = new FormData();
-      formData.append('template_id', template.template_id);
-      formData.append('template_creator', template.template_creator);
-      formData.append('action', action);
-
-      var {data} = await axios.post(base_url+'settings/templates/check-permission', formData);
+      var data = await this.userPermissions.find((permission) => {
+        return permission.action === action && permission.model_name === model_name;
+      });
       // if status updated
-      if (data.success) {
+      if (data !== null) {
         status = true;
       }
       return status;
@@ -244,7 +247,7 @@ new Vue({
   created() {
     // after page is created call those method
     this.fetchtemplates();
-
+    this.authPermissions();
     var self = this;
     // if click on pagination link icon
     $(document).on("click", ".pagination li a", function(e) {

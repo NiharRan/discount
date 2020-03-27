@@ -48,7 +48,35 @@ class Restaurant extends CI_Controller {
 			$data['content'] = 'admin/restaurant/list';
 			$this->load->view('layouts/master', $data);
 		}
-    }
+	}
+	
+
+	/***
+	 * @route {{ settings/feature-restaurants }}
+	 * @return feature restaurant list page
+	 * using vue
+	 */
+	function featureRestaurants()
+	{
+		// if user is not logged in 
+		// redirect him/her to login page
+		if (!$this->tank_auth->is_logged_in()) {
+			redirect('/auth/login/');
+		} else {
+            // this is the page title
+			$data['title'] = 'Offer.com || Restaurants';
+			$data['user_id']	= $this->tank_auth->get_user_id();
+			$data['username']	= $this->tank_auth->get_username();
+            
+			// view page data
+			$data['extrastyle'] = 'inc/_vuestyle';
+			$data['extrascript'] = 'inc/_vuescript';
+			$data['vuecomponent'] = 'components/restaurant/feature';
+
+			$data['content'] = 'admin/restaurant/feature';
+			$this->load->view('layouts/master', $data);
+		}
+	}
 	
 	/**
 	 * new restaurant info store by this method. 
@@ -265,7 +293,7 @@ class Restaurant extends CI_Controller {
 	 */
 	function fetch_by_slug()
 	{
-		// intialize response data
+		// initialize response data
 		$jsonData = array('success' => false, 'data' => '');
 
 		// get restaurant slug from url
@@ -290,7 +318,7 @@ class Restaurant extends CI_Controller {
 	 */
 	function has_permission_to_action_restaurant()
 	{
-		// intialize response data
+		// initialize response data
 		$jsonData = array('success' => false);
 		$query['restaurant_creator'] = $this->input->post('restaurant_creator');
 		$query['restaurant_id'] = $this->input->post('restaurant_id');
@@ -597,7 +625,33 @@ class Restaurant extends CI_Controller {
 			$jsonData['data'] = $restaurants;
 			$jsonData['links'] = $this->custom->paginate($obj);
 		}
-		// responde send
+		// response send
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * search restaurants by this method. 
+	 * for make feature restaurant or slider restaurant
+	 * Return restaurant list if table is not empty
+	 * otherwise null.
+	 *
+	 * @return	array[object] restaurant list
+	 */
+	function searchRestaurants()
+	{
+		// response object
+		$jsonData = array('success' => false, 'data' => array());
+
+		$query['search'] = $this->input->get('search');
+		$query['restaurant_creator'] = '';
+		// fetch 6 restaurants start from 'offset' where query
+		$restaurants = $this->restaurant_model->fetch_all_restaurants(6, 1, $query);
+
+		if (count($restaurants) > 0) {
+			$jsonData['success'] = true;
+			$jsonData['data'] = $restaurants;
+		}
+		// response send
 		echo json_encode($jsonData);
 	}
 
@@ -611,7 +665,7 @@ class Restaurant extends CI_Controller {
 	 */
 	function changestatus()
 	{
-		// intialize response data
+		// initialize response data
 		$jsonData = array('success' => false);
 		$restaurant_status = $this->input->post('restaurant_status');
 		$restaurant_id = $this->input->post('restaurant_id');
@@ -634,7 +688,7 @@ class Restaurant extends CI_Controller {
 	 */
 	function allactiverestaurants()
 	{
-		// intialize response data
+		// initialize response data
 		$jsonData = array('success' => false, 'data' => array());
 		// logged in user's restaurants will be fetched this method
 		$restaurant_creator = $this->session->userdata('user_id');

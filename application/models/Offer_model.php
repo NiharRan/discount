@@ -1,12 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * Offer_Model
- *
- * This model store offer data. It operates the following tables:
- * - offer table data
- *
- */
+
 class Offer_Model extends CI_Model
 {
 	private $table			= 'offers';			// offer table

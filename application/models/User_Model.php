@@ -1,12 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- * User_Model
- *
- * This model store user data. It operates the following tables:
- * - user table data
- *
- */
 class User_Model extends CI_Model
 {
 	private $table			= 'users';			// user table
@@ -78,10 +71,10 @@ class User_Model extends CI_Model
     function fetch_all_users($limit, $start, $query)
     {
         $search = $query['search'];
-        $this->db->select('users.*, usertypes.user_type_name')->from($this->table);
-        // join usertypes table with users table
-        $this->db->join('usertypes', 'usertypes.user_type_id=users.user_type', 'left')
-                 ->where('usertypes.user_type_status', 1);
+        $this->db->select('users.*, roles.role_name')->from($this->table);
+        // join roles table with users table
+        $this->db->join('roles', 'roles.role_id=users.role', 'left')
+                 ->where('roles.role_status', 1);
         // if client search something
         if(!empty($search)) $this->db->like('user_name', $search);
         return $this->db->limit($limit, $start)->get()->result_array();
@@ -126,15 +119,15 @@ class User_Model extends CI_Model
     }
 
     /**
-     * this method fetch total rows from usertypes table
-     * if user_type_status === 1
-     * @return usertypes object list
+     * this method fetch total rows from roles table
+     * if role_status === 1
+     * @return roles object list
      */
-    function fetch_all_active_user_types()
+    function fetch_all_active_roles()
     {
         return $this->db->select('*')
-                        ->from('usertypes')
-                        ->where('user_type_status', 1)
+                        ->from('roles')
+                        ->where('role_status', 1)
                         ->get()
                         ->result_array();
     }
