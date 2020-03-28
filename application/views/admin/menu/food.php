@@ -4,7 +4,7 @@
         <div class="col" style="margin-top: 108px;">
             <div class="card shadow">
                 <div class="card-header border-0">
-                    <h3 class="mb-0"><i class="fas fa-store"></i> food Lists
+                    <h3 class="mb-0"><i class="fas fa-store"></i> Food Lists
                         <!-- if food has permission to create food -->
                         <?php if($this->permission->has_permission('menu-food', 'create')) {?>
                             <button type="button" class="btn btn-sm btn-primary float-right" @click="openModal('#foodCreateModal')" data-toggle="modal">
@@ -23,6 +23,7 @@
                                     <th>Food</th>
                                     <th>Category</th>
                                     <th>Lowest Price</th>
+                                    <th>Tags</th>
                                     <th class="text-center">Status</th>
                                     <th></th>
                                 </tr>
@@ -34,7 +35,10 @@
                                         {{ food.food_name }}
                                     </th>
                                     <td>{{ food.category.category_name }}</td>
-                                    <td>{{ food.food_lowest_price }}</td>
+                                    <td>{{ food.food_lowest_price }}$</td>
+                                    <td>
+                                        <span class="badge badge-success mx-1" v-for="food_tag in food.food_tags" :key="food_tag.menu_tag_id">{{ food_tag.menu_tag_name }}</span>
+                                    </td>
                                     <td><span class="badge" :class="[ food.food_status == 1 ? 'badge-success' : 'badge-danger']">{{ food.food_status == 1 ? 'Active' : 'Inactive' }}</span></td>
                                     <td class="text-right">
                                         <div class="dropdown">
@@ -90,7 +94,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
                                             <label class="form-control-label">Food</label>
-                                            <input type="text" v-model="formData.food_name" class="form-control form-control-alternative" placeholder="Food Name">
+                                            <input type="text" v-model="fData.food_name" class="form-control form-control-alternative" placeholder="Food Name">
                                             <!-- if food_name field is empty and try to submit show error message -->
                                             <small class="text-danger">{{ errors.food_name }}</small>
                                         </div>
@@ -98,7 +102,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
                                             <label class="form-control-label">Lowest Price</label>
-                                            <input type="text" v-model="formData.food_lowest_price" class="form-control form-control-alternative" placeholder="Food Lowest Price">
+                                            <input type="text" v-model="fData.food_lowest_price" class="form-control form-control-alternative" placeholder="Food Lowest Price">
                                             <!-- if food_lowest_price field is empty and try to submit show error message -->
                                             <small class="text-danger">{{ errors.food_lowest_price }}</small>
                                         </div>
@@ -108,7 +112,7 @@
                                         <div class="form-group">
                                             <label class="form-control-label">Category</label>
                                             <multiselect 
-                                                v-model="formData.category" 
+                                                v-model="fData.category" 
                                                 :options="categories" 
                                                 :close-on-select="true" 
                                                 :clear-on-select="true" 
@@ -125,6 +129,29 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-4 col-sm-12"></div>
+                            <div class="col-md-12 col-sm-12 mb-4">
+                                <label>Tags</label>
+                                <multiselect 
+                                    v-model="fData.food_tags" 
+                                    label="menu_tag_name" 
+                                    track-by="menu_tag_name" 
+                                    placeholder="Type to search" 
+                                    :options="menu_tags" 
+                                    :multiple="true" 
+                                    :searchable="true" 
+                                    :loading="isFetching" 
+                                    :options-limit="300" 
+                                    :limit="3" 
+                                    :max-height="600" 
+                                    :hide-selected="true" 
+                                    @search-change="fetchTags">
+                                    <template slot="food_tags" slot-scope="{ option, remove }"><span class="custom__tag"><span>{{ option.menu_tag_name }}</span><span class="custom__remove" @click="remove(option)">❌</span></span></template>
+                                    <template slot="clear" slot-scope="props">
+                                    <div class="multiselect__clear" v-if="fData.food_tags.length" @mousedown.prevent.stop="clearAll(props.search)"></div>
+                                    </template><span slot="noResult">Oops! No elements found.</span>
+                                </multiselect>
+                            </div>
                             <div class="col-md-12 col-sm-12 text-center">
                                 <button type="submit" class="btn btn-success btn-sm">Create</button>
                             </div>
@@ -140,7 +167,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title" style="flex: 1;">Update <span class="text-success">{{ formData.name }}</span>'s Info
+                    <h3 class="modal-title" style="flex: 1;">Update <span class="text-success">{{ fData.name }}</span>'s Info
                         <button type="button" class="close float-right" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -158,7 +185,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
                                             <label class="form-control-label">Food</label>
-                                            <input type="text" v-model="formData.food_name" class="form-control form-control-alternative" placeholder="Food Name">
+                                            <input type="text" v-model="fData.food_name" class="form-control form-control-alternative" placeholder="Food Name">
                                             <!-- if food_name field is empty and try to submit show error message -->
                                             <small class="text-danger">{{ errors.food_name }}</small>
                                         </div>
@@ -166,7 +193,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
                                             <label class="form-control-label">Lowest Price</label>
-                                            <input type="text" v-model="formData.food_lowest_price" class="form-control form-control-alternative" placeholder="Food Lowest Price">
+                                            <input type="text" v-model="fData.food_lowest_price" class="form-control form-control-alternative" placeholder="Food Lowest Price">
                                             <!-- if food_lowest_price field is empty and try to submit show error message -->
                                             <small class="text-danger">{{ errors.food_lowest_price }}</small>
                                         </div>
@@ -176,7 +203,7 @@
                                         <div class="form-group">
                                             <label class="form-control-label">Category</label>
                                             <multiselect 
-                                                v-model="formData.category" 
+                                                v-model="fData.category" 
                                                 :options="categories" 
                                                 :close-on-select="true" 
                                                 :clear-on-select="true" 
@@ -192,6 +219,26 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 mb-4">
+                                <label>Tags</label>
+                                <multiselect 
+                                    v-model="fData.food_tags" 
+                                    label="menu_tag_name" 
+                                    track-by="menu_tag_name" 
+                                    placeholder="Type to search" 
+                                    :options="menu_tags" 
+                                    :multiple="true" 
+                                    :searchable="true" 
+                                    :loading="isFetching" 
+                                    :max-height="600" 
+                                    :hide-selected="true" 
+                                    @search-change="fetchTags">
+                                    <template slot="food_tag" slot-scope="{ option, remove }"><span class="custom__tag"><span>{{ option.menu_tag_name }}</span><span class="custom__remove" @click="remove(option)">❌</span></span></template>
+                                    <template slot="clear" slot-scope="props">
+                                    <div class="multiselect__clear" v-if="fData.food_tags.length" @mousedown.prevent.stop="clearAll(props.search)"></div>
+                                    </template><span slot="noResult">Oops! No elements found.</span>
+                                </multiselect>
                             </div>
                             <div class="col-md-12 col-sm-12 text-center">
                                 <button type="submit" class="btn btn-success btn-sm">Update</button>

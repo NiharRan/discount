@@ -18,7 +18,8 @@ class Food_Model extends CI_Model
      */
     function store($data)
     {
-        return $this->db->insert($this->table, $data);
+        $this->db->insert($this->table, $data);
+        return $this->db->insert_id();
     }
 
     /**
@@ -101,6 +102,15 @@ class Food_Model extends CI_Model
         $query = $this->db->limit($limit, $start)->get()->result_array();
 
         foreach ($query as $key => $food) {
+            /**
+            * this method fetch total rows
+            * @param join_table 
+            * @param target_table
+            * @param searching_key
+            * @return searching_value
+            * @return join_key
+            */
+            $query[$key]['food_tags'] = $this->global_model->belong_to_many('food_tags', 'menu_tags', 'food_id', $food['food_id'], 'menu_tag_id');
             $query[$key]['category'] = $this->global_model->has_one('categories', 'category_id', $food['category_id']);
         }
         return $query;
@@ -117,5 +127,11 @@ class Food_Model extends CI_Model
                         ->where('food_status', 1)
                         ->get()
                         ->result_array();
+    }
+
+
+    public function save_food_tag($data)
+    {
+        $this->db->insert('food_tags', $data);
     }
 }

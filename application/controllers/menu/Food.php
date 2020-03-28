@@ -71,10 +71,20 @@ class Food extends CI_Controller {
             $data['food_creator'] = $this->tank_auth->get_user_id();
 			$food_id = $this->input->post('food_id');
 
-			$result = $this->food_model->store($data);
+			$food_id = $this->food_model->store($data);
 
-			// if data updated make success true
-			if ($result) {
+			// if data stored make success true
+			if ($food_id) {
+				$food_tags = explode(',', $this->input->post('food_tags'));
+				if (sizeof($food_tags) > 0) {
+					foreach ($food_tags as $menu_tag_id) {
+						$data = array(
+							'food_id' => $food_id,
+							'menu_tag_id' => $menu_tag_id,
+						);
+						$result = $this->food_model->save_food_tag($data);
+					}
+				}
 				$jsonData['success'] = true;
 			}
 		}else {
@@ -118,9 +128,19 @@ class Food extends CI_Controller {
 			$food_id = $this->input->post('food_id');
 
 			$result = $this->food_model->update($data, $food_id);
-
 			// if data updated make success true
 			if ($result) {
+				$food_tags = explode(',', $this->input->post('food_tags'));
+				if (sizeof($food_tags) > 0) {
+					$this->db->where('food_id', $food_id)->delete('food_tags');
+					foreach ($food_tags as $menu_tag_id) {
+						$data = array(
+							'food_id' => $food_id,
+							'menu_tag_id' => $menu_tag_id,
+						);
+						$result = $this->food_model->save_food_tag($data);
+					}
+				}
 				$jsonData['success'] = true;
 			}
 		}else {

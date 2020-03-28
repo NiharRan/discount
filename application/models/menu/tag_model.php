@@ -3,7 +3,7 @@
 
 class Tag_Model extends CI_Model
 {
-	private $table			= 'tags';			// tag table
+	private $table			= 'menu_tags';			// menu_tag table
 
 	function __construct()
 	{
@@ -12,7 +12,7 @@ class Tag_Model extends CI_Model
     }
 
     /**
-     * this method store new tag
+     * this method store new menu_tag
      * @param data object
      * @return bool
      */
@@ -22,51 +22,51 @@ class Tag_Model extends CI_Model
     }
 
     /**
-     * this method update tag
+     * this method update menu_tag
      * @param data object
-     * @param tag_id integer
+     * @param menu_tag_id integer
      * @return bool
      */
-    function update($data, $tag_id)
+    function update($data, $menu_tag_id)
     {
-        return $this->db->where('tag_id', $tag_id)->update($this->table, $data);
+        return $this->db->where('menu_tag_id', $menu_tag_id)->update($this->table, $data);
     }
 
     /**
-     * this method delete tag
-     * @param tag_id integer
+     * this method delete menu_tag
+     * @param menu_tag_id integer
      * @return bool
      */
-    function remove($tag_id)
+    function remove($menu_tag_id)
     {
-        return $this->db->where('tag_id', $tag_id)->delete($this->table);
+        return $this->db->where('menu_tag_id', $menu_tag_id)->delete($this->table);
     }
 
 
      /**
-     * this method fetch tag info on condition
-     * @return tagInfo object 
+     * this method fetch menu_tag info on condition
+     * @return menu_tagInfo object 
      */
-    function fetch_tag_on_condition($query)
+    function fetch_menu_tag_on_condition($query)
     {
         $this->db->select('*')->from($this->table);
 
-        if(isset($query['tag_id'])) {
-            $this->db->where('tag_id', $query['tag_id']);
+        if(isset($query['menu_tag_id'])) {
+            $this->db->where('menu_tag_id', $query['menu_tag_id']);
         }
 
-        if(isset($query['tag_slug'])) {
-            $this->db->where('tag_slug', $query['tag_slug']);
+        if(isset($query['menu_tag_slug'])) {
+            $this->db->where('menu_tag_slug', $query['menu_tag_slug']);
         }
 
-        $this->db->group_by('tag_id')->order_by('visit_count', 'desc');
+        $this->db->group_by('menu_tag_id')->order_by('visit_count', 'desc');
         if(isset($query['limit'])) {
             $this->db->limit($query['limit'], 0);
         }
         $query = $this->db->get()->result_array();
 
         // with restaurant, user, template info
-        foreach ($query as $key => $tag) {
+        foreach ($query as $key => $menu_tag) {
             
         }
         return count($query) == 1 ? $query[0] : $query;
@@ -77,11 +77,11 @@ class Tag_Model extends CI_Model
      * @param query object
      * @return total_rows integer
      */
-    function fetch_total_tag_rows($query)
+    function fetch_total_menu_tag_rows($query)
     {
         $search = $query['search'];
         $this->db->select('*')->from($this->table);
-        if(!empty($search)) $this->db->like('tag_name', $search);
+        if(!empty($search)) $this->db->like('menu_tag_name', $search);
         return $this->db->get()->num_rows();
     }
 
@@ -90,26 +90,26 @@ class Tag_Model extends CI_Model
      * @param limit integer
      * @param start integer
      * @param query object
-     * @return tags object list
+     * @return menu_menu_tags object list
      */
-    function fetch_all_tags($limit, $start, $query)
+    function fetch_all_menu_tags($limit, $start, $query)
     {
         $search = $query['search'];
         $this->db->select('*')->from($this->table);
         // if client search something
-        if(!empty($search)) $this->db->like('tag_name', $search);
+        if(!empty($search)) $this->db->like('menu_tag_name', $search);
         return $this->db->limit($limit, $start)->get()->result_array();
     }
 
     /**
-     * fetch all active tags
-     * @return taglist array
+     * fetch all active menu_menu_tags
+     * @return menu_taglist array
      */
-    function fetch_all_active_tags()
+    function fetch_all_active_menu_tags()
     {
         return $this->db->select('*')
-                        ->from('tags')
-                        ->where('tag_status', 1)
+                        ->from('menu_menu_tags')
+                        ->where('menu_tag_status', 1)
                         ->get()
                         ->result_array();
     }

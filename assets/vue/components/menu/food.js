@@ -3,24 +3,24 @@ var base_url = $("#base_url").val();
 new Vue({
   el: "#food_list",
   data: {
-    formData: {
+    fData: {
       food_id: '',
       food_name: '',
       food_lowest_price: '',
-      category: ''
+      category: {},
+      food_tags: []
     },
     bannerUrl: base_url+"uploads/default/user/default-banner.png",
     categories: [],
     foods: [],
+    menu_tags: [],
     userPermissions: [],
     links: '',
     search: '',
     errors: {
-      name: '',
-      username: '',
-      role: ''
     },
     isLoading: false,
+    isFetching: false
   },
 
   methods: {
@@ -29,26 +29,33 @@ new Vue({
       $(modalName).modal('show');
     },
     cleanForm(modelName) {
-      // clean formData form
-      this.formData.food_name = '';
-      this.formData.food_lowest_price = '';
-      this.formData.category = {};
-      this.formData.food_id = '';
+      // clean fData form
+      this.fData.food_name = '';
+      this.fData.food_lowest_price = '';
+      this.fData.category = {};
+      this.fData.food_id = '';
+      this.food_tags =  [];
       this.fetchFoods();
       $(modelName).modal("hide");
       // clean errors
       this.errors = {};
+      this.isLoading = false;
     },
     async store() {
       this.isLoading = true;
-      var data = new FormData();
-      // add food info to formData object
-      var category_id = typeof this.formData.category == "object" ? this.formData.category.category_id : this.formData.category;
-      data.append("food_name", this.formData.food_name);
-      data.append("category_id", category_id);
-      data.append("food_lowest_price", this.formData.food_lowest_price);
+      var query = new FormData();
+      // add food tags to query object
+      var foodTags = this.fData.food_tags.map(function (menu_tag) {
+        return menu_tag.menu_tag_id;
+      });
+      // add food info to fData object
+      var category_id = this.fData.category['category_id'] === undefined ? '' : this.fData.category.category_id;
+      query.append("food_name", this.fData.food_name);
+      query.append("food_tags", foodTags);
+      query.append("category_id", category_id);
+      query.append("food_lowest_price", this.fData.food_lowest_price);
       // send api post request to server
-      var {data} = await axios.post(base_url + "menu/foods/store", data);
+      var {data} = await axios.post(base_url + "menu/foods/store", query);
       // if form validation done
       if (data.check) {
         // if data stored in server
@@ -77,15 +84,20 @@ new Vue({
     },
     async update() {
       this.isLoading = true;
-      var data = new FormData();
-      // add food info to formData object
-      var category_id = typeof this.formData.category == "object" ? this.formData.category.category_id : this.formData.category;
-      data.append("food_name", this.formData.food_name);
-      data.append("food_id", this.formData.food_id);
-      data.append("category_id", category_id);
-      data.append("food_lowest_price", this.formData.food_lowest_price);
+      var query = new FormData();
+      // add food tags to query object
+      var foodTags = this.fData.food_tags.map(function (menu_tag) {
+        return menu_tag.menu_tag_id;
+      });
+      // add food info to fData object
+      var category_id = this.fData.category['category_id'] === undefined ? '' : this.fData.category.category_id;
+      query.append("food_name", this.fData.food_name);
+      query.append("food_id", this.fData.food_id);
+      query.append("food_tags", foodTags);
+      query.append("category_id", category_id);
+      query.append("food_lowest_price", this.fData.food_lowest_price);
       // send api post request to server
-      var {data} = await axios.post(base_url + "menu/foods/update", data);
+      var {data} = await axios.post(base_url + "menu/foods/update", query);
       // if form validation done
       if (data.check) {
         // if data stored in server
@@ -138,13 +150,14 @@ new Vue({
     },
     openFoodEditModel (food) {
       this.isLoading = true;
-      this.formData.food_id = food.food_id;
-      this.formData.food_name = food.food_name;
-      this.formData.food_lowest_price = food.food_lowest_price;
+      this.fData.food_id = food.food_id;
+      this.fData.food_name = food.food_name;
+      this.fData.food_lowest_price = food.food_lowest_price;
       var category = this.categories.find(function (category) {
         return category.category_id === food.category_id;
       })
-      this.formData.category = category;
+      this.fData.food_tags = food.food_tags;
+      this.fData.category = category;
       $('#foodEditModal').modal('show');
       this.isLoading = false;
     },
@@ -194,14 +207,14 @@ new Vue({
        * @param food_status
        * @response success
        */
-      var formData = new FormData();
+      var fData = new FormData();
       var self = this;
       var statusMsg = food.food_status == 1 ? "Inactive" : "Active";
-      formData.append('food_status', food.food_status);
-      formData.append('food_id', food.food_id);
+      fData.append('food_status', food.food_status);
+      fData.append('food_id', food.food_id);
 
       // send request to server
-      var {data} = await axios.post(base_url+'menu/foods/change-status', formData);
+      var {data} = await axios.post(base_url+'menu/foods/change-status', fData);
       // if status updated
       if (data.success) {
         self.fetchFoods();
@@ -238,6 +251,17 @@ new Vue({
       }
       return status;
     },
+
+    async fetchTags(query) {
+      this.isFetching = true;
+      var fData = new FormData();
+      fData.append('search', query);
+      const response = await axios.get(base_url+'menu/menu-tags/all', fData);
+      if (response.status === 200) {
+        this.menu_tags = response.data.data;
+        this.isFetching = false;
+      }
+    }
   },
   created() {
     // after page is created call those method

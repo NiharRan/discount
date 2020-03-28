@@ -85,11 +85,12 @@ $route['user/change-status'] = 'user/changestatus';
 
 
 //Menu Tag routes
-$route['menu/tags'] = 'menu/tag/index';
-$route['menu/tags/store'] = 'menu/tag/store';
-$route['menu/tags/update'] = 'menu/tag/update';
-$route['menu/tags/remove/(:num)'] = 'menu/tag/delete/$1';
-$route['menu/tags/change-status'] = 'menu/tag/changeStatus';
+$route['menu/menu-tags'] = 'menu/tag/index';
+$route['menu/menu-tags/all'] = 'menu/tag/allMenuTags';
+$route['menu/menu-tags/store'] = 'menu/tag/store';
+$route['menu/menu-tags/update'] = 'menu/tag/update';
+$route['menu/menu-tags/remove/(:num)'] = 'menu/tag/delete/$1';
+$route['menu/menu-tags/change-status'] = 'menu/tag/changeStatus';
 
 //Menu Categories routes
 $route['menu/categories'] = 'menu/category/index';
@@ -120,8 +121,23 @@ $route['menu/foods/remove/(:num)'] = 'menu/food/delete/$1';
 $route['menu/foods/change-status'] = 'menu/food/changeStatus';
 
 
+//Menu Product routes
+$route['menu/food-prices'] = 'menu/price/index';
+$route['menu/food-prices/all'] = 'menu/price/allFoodPrices';
+$route['menu/food-prices/active'] = 'menu/price/allActiveFoodPrices';
+$route['menu/food-prices/store'] = 'menu/price/store';
+$route['menu/food-prices/update'] = 'menu/price/update';
+$route['menu/food-prices/remove/(:num)'] = 'menu/price/delete/$1';
+$route['menu/food-prices/change-status'] = 'menu/price/changeStatus';
 
-
+//Menu Product routes
+$route['menu/food-aditionals'] = 'menu/aditional/index';
+$route['menu/food-aditionals/all'] = 'menu/aditional/allFoodAditionals';
+$route['menu/food-aditionals/active'] = 'menu/aditional/allActiveFoodAditionals';
+$route['menu/food-aditionals/store'] = 'menu/aditional/store';
+$route['menu/food-aditionals/update'] = 'menu/aditional/update';
+$route['menu/food-aditionals/remove/(:num)'] = 'menu/aditional/delete/$1';
+$route['menu/food-aditionals/change-status'] = 'menu/aditional/changeStatus';
 
 // web routes
 $route['web/offer/(:any)'] = 'web/singeOffer';

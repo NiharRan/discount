@@ -154,7 +154,7 @@
             <!-- if user has permission to view menu-tag list -->
             <?php if($this->permission->has_permission('menu-tag', 'list-view')) {?>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo base_url(); ?>menu/tags">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/menu-tags">
               <i class="fas fa-tag text-green"></i> Tags
               </a>
             </li>
@@ -174,6 +174,24 @@
             <li class="nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>menu/foods">
               <i class="fas fa-tag text-green"></i> Foods
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view menu-food-price list -->
+            <?php if($this->permission->has_permission('menu-food-price', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/food-prices">
+              <i class="fas fa-tag text-primary"></i> Food Prices
+              </a>
+            </li>
+            <?php }?>
+
+            <!-- if user has permission to view menu-food-aditional list -->
+            <?php if($this->permission->has_permission('menu-food-aditional', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>menu/food-aditionals">
+              <i class="fas fa-tag text-primary"></i> Food Aditionals
               </a>
             </li>
             <?php }?>

@@ -15,7 +15,7 @@ class Tag extends CI_Controller {
 	}
 
 	/***
-	 * @route {{ menu/tags }}
+	 * @route {{ menu/menu_tags }}
 	 * @return tag list page
 	 * using vue
 	 */
@@ -42,26 +42,26 @@ class Tag extends CI_Controller {
 	
 	/**
 	 * new tag store by this method. 
-	 * Return TRUE if tags are stored successfully
+	 * Return TRUE if menu_tags are stored successfully
 	 * otherwise FALSE.
 	 *
-	 * @param	stringArray	(tag_names [single or multiple])
+	 * @param	stringArray	(menu_tag_names [single or multiple])
 	 * @return	bool
 	 */
 	function store()
 	{
 		// response array
 		$jsonData = array('success' => false);
-		// convert tags from string to array
-		$tags = explode(',', $_POST['tags']);
+		// convert menu_tags from string to array
+		$menu_tags = explode(',', $_POST['menu_tags']);
 
-		foreach ($tags as $key => $value) {
-			// store all tags one by one
+		foreach ($menu_tags as $key => $value) {
+			// store all menu_tags one by one
 			$data = array(
-				'tag_name' => $tags[$key],
-				'tag_slug' => url_title($tags[$key]),
-				'tag_status' => 1,
-				'tag_created_at' => date('Y-m-d')
+				'menu_tag_name' => $menu_tags[$key],
+				'menu_tag_slug' => url_title($menu_tags[$key]),
+				'menu_tag_status' => 1,
+				'menu_tag_created_at' => date('Y-m-d')
 			);
 			// store tag through tag model
 			$result = $this->tag_model->store($data);
@@ -78,8 +78,8 @@ class Tag extends CI_Controller {
 	 * Return TRUE if tag are updated successfully
 	 * otherwise FALSE.
 	 *
-	 * @param	tag_name
-	 * @param tag_id
+	 * @param	menu_tag_name
+	 * @param menu_tag_id
 	 * @return	bool
 	 */
 	function update()
@@ -88,16 +88,16 @@ class Tag extends CI_Controller {
 		$jsonData = array('success' => false, 'check' => false, 'errors' => array());
 		
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('tag_name', 'Name',  'required');
+		$this->form_validation->set_rules('menu_tag_name', 'Name',  'required');
 		if ($this->form_validation->run()) {
 			// if form validation successful
 			$jsonData['check'] = true;
 			// get tag name and id
-			$data['tag_name'] = $this->input->post('tag_name');
-			$data['tag_slug'] = url_title($this->input->post('tag_name'));
-			$tag_id = $this->input->post('tag_id');
+			$data['menu_tag_name'] = $this->input->post('menu_tag_name');
+			$data['menu_tag_slug'] = url_title($this->input->post('menu_tag_name'));
+			$menu_tag_id = $this->input->post('menu_tag_id');
 
-			$result = $this->tag_model->update($data, $tag_id);
+			$result = $this->tag_model->update($data, $menu_tag_id);
 
 			// if data updated make success true
 			if ($result) {
@@ -119,14 +119,14 @@ class Tag extends CI_Controller {
 	 * Return TRUE if deleted successfully
 	 * otherwise FALSE.
 	 *
-	 * @param tag_id
+	 * @param menu_tag_id
 	 * @return	bool
 	 */
-	function delete($tag_id)
+	function delete($menu_tag_id)
 	{
 		// response array
 		$jsonData = array('success' => false);
-		$result = $this->tag_model->remove($tag_id);
+		$result = $this->tag_model->remove($menu_tag_id);
 		// if tag deleted successfully
 		if($result) {
 			$jsonData['success'] = true;
@@ -137,13 +137,13 @@ class Tag extends CI_Controller {
 	}
 
 	/**
-	 * fetch all tags by this method. 
+	 * fetch all menu_tags by this method. 
 	 * Return tag list if table is not empty
 	 * otherwise null.
 	 *
 	 * @return	array[object] tag list
 	 */
-	function allTags()
+	function allMenuTags()
 	{
 		// take the last tag id
 		$offset = $this->input->get('offset') ? $this->input->get('offset') : 0;
@@ -155,27 +155,27 @@ class Tag extends CI_Controller {
 		// response object
 		$jsonData = array('success' => false, 'data' => array(), 'links' => '');
 
-		// total rows in tags table according to search query
-		$total_rows = $this->tag_model->fetch_total_tag_rows($query);
-		// fetch 10 tags start from 'offset' where query
-		$tags = $this->tag_model->fetch_all_tags($perpage, $offset, $query);
+		// total rows in menu_tags table according to search query
+		$total_rows = $this->tag_model->fetch_total_menu_tag_rows($query);
+		// fetch 10 menu_tags start from 'offset' where query
+		$menu_tags = $this->tag_model->fetch_all_menu_tags($perpage, $offset, $query);
 		// config data to create pagination
 		$obj = array(
-			'base_url' => base_url().'tag/allTags/',
+			'base_url' => base_url().'tag/allmenu_Tags/',
 			'per_page' => $perpage,
 			'uri_segment' => 2,
 			'total_rows' => $total_rows
 		);
 		/**
-		 * if tags is not empty
+		 * if menu_tags is not empty
 		 * @response object
 		 * 	 success => everything all right
 		 *   data => tag list
 		 * 	 links => pagination links
 		 */
-		if (count($tags) > 0) {
+		if (count($menu_tags) > 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $tags;
+			$jsonData['data'] = $menu_tags;
 			$jsonData['links'] = $this->custom->paginate($obj);
 		}
 		// response send
@@ -183,27 +183,27 @@ class Tag extends CI_Controller {
 	}
 
 	/**
-	 * fetch all active tags by this method. 
+	 * fetch all active menu_tags by this method. 
 	 * Return tag list if table is not empty
 	 * otherwise null.
 	 *
 	 * @return	array[object] tag list
 	 */
-	function allActiveTags()
+	function allActiveMenuTags()
 	{
 		// response object
 		$jsonData = array('success' => false, 'data' => array());
 
-		$tags = $this->tag_model->fetch_all_active_tags();
+		$menu_tags = $this->tag_model->fetch_all_active_menu_tags();
 		/**
-		 * if tags is not empty
+		 * if menu_tags is not empty
 		 * @response object
 		 * 	 success => everything all right
 		 *   data => tag list
 		 */
-		if (count($tags) > 0) {
+		if (count($menu_tags) > 0) {
 			$jsonData['success'] = true;
-			$jsonData['data'] = $tags;
+			$jsonData['data'] = $menu_tags;
 		}
 		// response send
 		echo json_encode($jsonData);
@@ -221,12 +221,12 @@ class Tag extends CI_Controller {
 	{
 		// initialize response data
 		$jsonData = array('success' => false);
-		$tag_status = $this->input->post('tag_status');
-		$tag_id = $this->input->post('tag_id');
+		$menu_tag_status = $this->input->post('menu_tag_status');
+		$menu_tag_id = $this->input->post('menu_tag_id');
 		// change status through this method
-		$result = $this->db->set('tag_status', $tag_status == 1 ? 0 : 1)
-						->where('tag_id', $tag_id)
-						->update("tags");
+		$result = $this->db->set('menu_tag_status', $menu_tag_status == 1 ? 0 : 1)
+						->where('menu_tag_id', $menu_tag_id)
+						->update("menu_tags");
 		// if status changed 
 		if ($result) {
 			$jsonData['success'] = true;
