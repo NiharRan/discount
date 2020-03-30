@@ -52,21 +52,34 @@ class Category extends CI_Controller {
 	function store()
 	{
 		// response array
-		$jsonData = array('success' => false);
-		$category_name = $this->input->post('category_name');
-
-		// store all categories one by one
-		$data = array(
-			'category_name' => $category_name,
-			'category_slug' => url_title($category_name),
-			'category_status' => 1,
-			'category_doc' => date('Y-m-d H:i:s'),
-			'category_creator' => $this->tank_auth->get_user_id()
-		);
-		// store category through category model
-		$result = $this->category_model->store($data);
-		// if stored successfully return true
-		if($result) $jsonData['success'] = true;
+		$jsonData = array('success' => false, 'check' => false, 'errors' => array());
+		
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('category_name', 'Name',  'required');
+		$this->form_validation->set_rules('restaurant_id', 'Restaurant',  'required');
+		if ($this->form_validation->run()) {
+			$jsonData['check'] = true;
+			$category_name = $this->input->post('category_name');
+			$restaurant_id = $this->input->post('restaurant_id');
+			// store all categories one by one
+			$data = array(
+				'category_name' => $category_name,
+				'restaurant_id' => $restaurant_id,
+				'category_slug' => url_title($category_name),
+				'category_status' => 1,
+				'category_doc' => date('Y-m-d H:i:s'),
+				'category_creator' => $this->tank_auth->get_user_id()
+			);
+			// store category through category model
+			$result = $this->category_model->store($data);
+			// if stored successfully return true
+			if($result) $jsonData['success'] = true;
+		}else {
+			// return form_validation errors
+			foreach ($_POST as $key => $value) {
+				$jsonData['errors'][$key] = form_error($key);
+			}
+		}
 		// send the response to client
 		echo json_encode($jsonData);
 	}
@@ -87,11 +100,13 @@ class Category extends CI_Controller {
 		
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('category_name', 'Name',  'required');
+		$this->form_validation->set_rules('restaurant_id', 'Restaurant',  'required');
 		if ($this->form_validation->run()) {
 			// if form validation successful
 			$jsonData['check'] = true;
 			// get category name and id
 			$data['category_name'] = $this->input->post('category_name');
+			$data['restaurant_id'] = $this->input->post('restaurant_id');
 			$data['category_dom'] = date('Y-m-d H:i:s');
 			$data['category_slug'] = url_title($this->input->post('category_name'));
 			$category_id = $this->input->post('category_id');
@@ -192,8 +207,8 @@ class Category extends CI_Controller {
 	{
 		// response object
 		$jsonData = array('success' => false, 'data' => array());
-
-		$categories = $this->category_model->fetch_all_active_categories();
+		$restaurant_slug = $this->input->post('restaurant_slug');
+		$categories = $this->category_model->fetch_all_active_categories($restaurant_slug);
 		/**
 		 * if categories is not empty
 		 * @response object

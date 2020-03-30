@@ -60,7 +60,7 @@ class Food_Model extends CI_Model
             $this->db->where('food_slug', $query['food_slug']);
         }
 
-        $this->db->group_by('food_id')->order_by('visit_count', 'desc');
+        $this->db->group_by('food_id')->order_by('food_id', 'desc');
         if(isset($query['limit'])) {
             $this->db->limit($query['limit'], 0);
         }
@@ -68,6 +68,12 @@ class Food_Model extends CI_Model
 
         // with category info
         foreach ($query as $key => $food) {
+			$food_prices = $this->global_model->has_many('food_prices', 'food_id', $food['food_id']);
+            foreach ($food_prices as $ke => $food_price) {
+                $food_prices[$ke]['food_size'] = $this->global_model->has_one('food_sizes', 'food_size_id', $food_price['food_size_id']);
+            }
+            $query[$key]['food_prices'] = $food_prices;
+            $query[$key]['food_tags'] = $this->global_model->belong_to_many('food_tags', 'menu_tags', 'food_id', $food['food_id'], 'menu_tag_id');
             $query[$key]['category'] = $this->global_model->has_one('categories', 'category_id', $food['category_id']);
         }
         return $query;

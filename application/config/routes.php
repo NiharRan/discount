@@ -31,11 +31,13 @@ $route['settings/roles/change-status'] = 'role/changestatus';
 // restaurant routes
 $route['restaurants'] = 'restaurant/index';
 $route['restaurants/all'] = 'restaurant/allrestaurants';
+$route['restaurants/search'] = 'restaurant/searchRestaurantsForCategory';
 $route['restaurants/create'] = 'restaurant/create';
 $route['restaurants/(:any)'] = 'restaurant/edit';
 $route['restaurant/edit/(:any)'] = 'restaurant/fetch_by_slug';
 $route['restaurants/check-permission'] = 'restaurant/has_permission_to_action_restaurant';
-$route['restaurant/change-status'] = 'restaurant/changestatus';
+$route['restaurant/change-status'] = 'restaurant/changeStatus';
+$route['restaurant/change-feature-status'] = 'restaurant/changeFeatureStatus';
 $route['settings/restaurant'] = 'restaurant/profile';
 $route['settings/feature-restaurants'] = 'restaurant/featureRestaurants';
 
@@ -46,6 +48,13 @@ $route['offers/all'] = 'offer/alloffers';
 $route['offers/create'] = 'offer/create';
 $route['offers/check-permission'] = 'offer/has_permission_to_action_offer';
 $route['offer/change-status'] = 'offer/changestatus';
+
+
+// order routes
+$route['orders'] = 'order/index';
+$route['orders/all'] = 'order/allOrders';
+$route['order/change-status'] = 'order/changestatus';
+$route['orders/remove/(:num)'] = 'order/delete/$1';
 
 // Permission routes
 $route['settings/permissions'] = 'access/index';
@@ -87,6 +96,7 @@ $route['user/change-status'] = 'user/changestatus';
 //Menu Tag routes
 $route['menu/menu-tags'] = 'menu/tag/index';
 $route['menu/menu-tags/all'] = 'menu/tag/allMenuTags';
+$route['menu/menu-tags/active'] = 'menu/tag/allActiveMenuTags';
 $route['menu/menu-tags/store'] = 'menu/tag/store';
 $route['menu/menu-tags/update'] = 'menu/tag/update';
 $route['menu/menu-tags/remove/(:num)'] = 'menu/tag/delete/$1';
@@ -118,6 +128,7 @@ $route['menu/foods/active'] = 'menu/food/allActiveFoods';
 $route['menu/foods/store'] = 'menu/food/store';
 $route['menu/foods/update'] = 'menu/food/update';
 $route['menu/foods/remove/(:num)'] = 'menu/food/delete/$1';
+$route['menu/foods/(:num)'] = 'menu/food/single';
 $route['menu/foods/change-status'] = 'menu/food/changeStatus';
 
 
@@ -139,8 +150,16 @@ $route['menu/food-aditionals/update'] = 'menu/aditional/update';
 $route['menu/food-aditionals/remove/(:num)'] = 'menu/aditional/delete/$1';
 $route['menu/food-aditionals/change-status'] = 'menu/aditional/changeStatus';
 
+
+$route['menu/(:any)'] = 'menu/web/index';
+$route['menu/(:any)/checkout'] = 'menu/web/checkout';
+$route['customer'] = 'menu/web/storeCustomerInfo';
+$route['order/create'] = 'menu/web/storeOrderInfo';
+$route['order-item'] = 'menu/web/storeOrderItemInfo';
+
 // web routes
 $route['web/offer/(:any)'] = 'web/singeOffer';
 $route['web/restaurant/(:any)'] = 'web/offersOfRestaurant';
+$route['stores/(:any)'] = 'web/allRestaurants';
 $route['web/category/(:any)'] = 'web/offersOfTag';
 $route['web/offers/search/(:any)'] = 'web/searchOfferByRestaurantAndTag';

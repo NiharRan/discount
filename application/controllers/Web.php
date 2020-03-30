@@ -188,4 +188,37 @@ class Web extends CI_Controller {
         $data['content'] = 'web/single';
         $this->load->view('layouts/web', $data);
 	}
+
+
+	function allRestaurants()
+	{
+		$data['featureRestaurants'] = $this->db->select('*')
+			->from('restaurants')
+			->where('feature_restaurant', 1)
+			->get()
+			->result_array();
+		$keys = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+		$searchKey = '';
+		if (isset($_GET['key'])) {
+			$searchKey = $this->input->get('key');
+			$data['restaurants'][$searchKey] = $this->restaurant_model->fetch_restaurants_by_key($searchKey);
+		}else {
+			foreach ($keys as $key) {
+				$data['restaurants'][$key] = $this->restaurant_model->fetch_restaurants_by_key($key);
+			}
+		}
+
+		foreach ($keys as $key) {
+			$data['total'][$key] = $this->restaurant_model->count_restaurants_by_key($key);
+		}
+		
+		$data['title'] = 'Offer.com || A-Z Restaurants';
+        $data['user_id']	= $this->tank_auth->get_user_id();
+		$data['username']	= $this->tank_auth->get_username();
+		
+		$data['except'] = 'sidebar';
+		$data['pageHeaderCover'] = 'web/includes/page-header-cover';
+        $data['content'] = 'web/restaurant-atz';
+        $this->load->view('layouts/web', $data);
+	}
 }

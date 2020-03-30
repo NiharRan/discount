@@ -98,18 +98,28 @@ class Category_Model extends CI_Model
         $this->db->select('*')->from($this->table);
         // if client search something
         if(!empty($search)) $this->db->like('category_name', $search);
-        return $this->db->limit($limit, $start)->get()->result_array();
+        $query = $this->db->limit($limit, $start)->get()->result_array();
+
+        // with restaurant info
+        foreach ($query as $key => $category) {
+            $query[$key]['restaurant'] = $this->global_model->has_one('restaurants', 'restaurant_id', $category['restaurant_id']);
+        }
+        return $query;
     }
 
     /**
      * fetch all active categories
-     * @return categorylist array
+     * @return restaurantlist array
      */
-    function fetch_all_active_categories()
+    function fetch_all_active_categories($restaurant_slug)
     {
-        return $this->db->select('*')
+        return $this->db->select('categories.*')
                         ->from('categories')
-                        ->where('category_status', 1)
+                        ->join('restaurants', 'restaurants.restaurant_id=categories.restaurant_id', 'left')
+                        ->where(array(
+                            'category_status' => 1,
+                            'restaurant_slug' => $restaurant_slug
+                        ))
                         ->get()
                         ->result_array();
     }

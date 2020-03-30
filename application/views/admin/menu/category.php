@@ -22,21 +22,48 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- if categories is not empty -->
-                    <div class="row" v-if="categories.length > 0">
-                        <!-- show all categories -->
-                        <div class="flex-container">
-                            <div class="flex-item" v-for="category in categories" :key="category.category_id">
-                                <p class="custom-btn" :class="[ category.category_status == 1 ? 'btn-outline-success' : 'btn-outline-warning' ]">
-                                    {{ category.category_name }}
-                                    <span class="icon-list">
-                                        <i class="fas fa-edit text-info" v-if="hasPermission('menu-category', 'edit')" @click="edit(category)"></i>
-                                        <i class="fas fa-trash text-danger" v-if="hasPermission('menu-category', 'delete')" @click="remove(category.category_id)"></i>
-                                        <i class="fas fa-eye text-warning" v-if="hasPermission('menu-category', 'edit')" @click="changeStatus(category)"></i>
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
+                    <div class="table-responsive" style="min-height: 400px;">
+                        <!-- if categories is not empty -->
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#SN</th>
+                                    <th>Category</th>
+                                    <th>Restaurant</th>
+                                    <th class="text-center">Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(category, key) in categories" :key="key">
+                                    <th>#{{ key + 1}}</th>
+                                    <th scope="row">
+                                        {{ category.category_name }}
+                                    </th>
+                                    <td>{{ category.restaurant.restaurant_name }}</td>
+                                    <td><span class="badge" :class="[ category.category_status == 1 ? 'badge-success' : 'badge-danger']">{{ category.category_status == 1 ? 'Active' : 'Inactive' }}</span></td>
+                                    <td class="text-right">
+                                        <div class="dropdown">
+                                            <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                <a class="dropdown-item" v-if="hasPermission('menu-category', 'edit')" @click="openCategoryEditModel(category)"><i class="fas fa-edit text-info"></i> Edit</a>
+                                                <a class="dropdown-item" v-if="hasPermission('menu-category', 'delete')" href="#" @click="remove(category.id)"><i class="fas fa-trash text-danger"></i> Remove</a>
+                                                <a class="dropdown-item" 
+                                                    v-if="hasPermission('menu-category', 'edit')" 
+                                                    href="#" 
+                                                    @click="changeStatus(category)">
+                                                        <i  class="fas" 
+                                                            :class="[category.category_status == 1 ? 'fa-times text-danger' : 'fa-check text-success' ]">
+                                                        </i> {{ category.category_status == 1 ? 'Inactive' : 'Active' }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="card-footer py-4">
@@ -62,9 +89,30 @@
                 </div>
                 <form @submit.prevent="store" :class="[isLoading ? 'v-hidden' : '']">
                     <div class="modal-body mb-0">
-                        <input type="text" v-model="formData.category_name" class="form-control" placeholder="Category Name">
-                        <!-- if category field is empty and try to submit show error message -->
-                        <span class="text-danger">{{ errors.category_name }}</span>
+                        <div class="form-group">
+                            <input type="text" v-model="formData.category_name" class="form-control" placeholder="Category Name">
+                            <!-- if category field is empty and try to submit show error message -->
+                            <span class="text-danger">{{ errors.category_name }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label">Restaurant</label>
+                            <multiselect 
+                                v-model="formData.restaurant" 
+                                label="restaurant_name" 
+                                track-by="restaurant_name" 
+                                placeholder="Type to search" 
+                                :options="restaurants" 
+                                :searchable="true" 
+                                :loading="isFetching" 
+                                :options-limit="300" 
+                                :limit="3" 
+                                :max-height="600" 
+                                :hide-selected="true" 
+                                @search-change="fetchRestaurants">
+                            </multiselect>
+                            <!-- if restaurant_id field is empty and try to submit show error message -->
+                            <small class="text-danger">{{ errors.restaurant_id }}</small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <!-- close to modal by clicking this button -->
@@ -80,16 +128,40 @@
     <!-- category Edit Modal -->
     <div class="modal fade" id="categoryEditModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="categoryEditModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div class="modal-content modal-xs">
+            <div class="modal-content">
                 <div class="lds-ripple" v-if="isLoading">
                     <div></div>
                     <div></div>
                 </div>
+                <div class="modal-header">
+                    <h2 class="modal-title">Update Category info</h2>
+                </div>
                 <form @submit.prevent="update" :class="[isLoading ? 'v-hidden' : '']">
                     <div class="modal-body pb-0">
-                        <input type="text" v-model="formData.category_name" class="form-control">
-                        <!-- if category field is empty and try to submit show error message -->
-                        <span class="text-danger">{{ errors.category_name }}</span>
+                        <div class="form-group">
+                            <input type="text" v-model="formData.category_name" class="form-control" placeholder="Category Name">
+                            <!-- if category field is empty and try to submit show error message -->
+                            <span class="text-danger">{{ errors.category_name }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label">Restaurant</label>
+                            <multiselect 
+                                v-model="formData.restaurant" 
+                                label="restaurant_name" 
+                                track-by="restaurant_name" 
+                                placeholder="Type to search" 
+                                :options="restaurants" 
+                                :searchable="true" 
+                                :loading="isFetching" 
+                                :options-limit="300" 
+                                :limit="3" 
+                                :max-height="600" 
+                                :hide-selected="true" 
+                                @search-change="fetchRestaurants">
+                            </multiselect>
+                            <!-- if restaurant_id field is empty and try to submit show error message -->
+                            <small class="text-danger">{{ errors.restaurant_id }}</small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <!-- close to modal by clicking this button -->

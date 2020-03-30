@@ -36,86 +36,88 @@
 <!-- Body Wrapper -->
 <div id="body-wrapper" class="animsition">
 
-    <!-- Header -->
-    <header id="header" class="light">
+    <div id="app">
+        <!-- Header -->
+        <header id="header" class="light">
 
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <!-- Logo -->
-                    <div class="module module-logo dark">
-                        <a href="<?php echo base_url(); ?>menu/web">
-                            <img src="<?php echo base_url(); ?>assets/menu/img/logo-light.svg" alt="" width="88">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <!-- Logo -->
+                        <div class="module module-logo dark">
+                            <a href="<?php echo base_url(); ?>menu/web">
+                                <img src="<?php echo base_url(); ?>assets/menu/img/logo-light.svg" alt="" width="88">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <!-- Navigation -->
+                        <nav class="module module-navigation left mr-4">
+                            <ul id="nav-main" class="nav nav-main">
+                                <li>
+                                    <a href="<?php echo base_url(); ?>menu/web">Home</a>
+                                </li>
+                                <li class="has-dropdown">
+                                    <a href="#">About</a>
+                                    <div class="dropdown-container">
+                                        <ul class="dropdown-mega">
+                                            <li><a href="page-about.html">About Us</a></li>
+                                            <li><a href="page-services.html">Services</a></li>
+                                            <li><a href="page-gallery.html">Gallery</a></li>
+                                            <li><a href="page-reviews.html">Reviews</a></li>
+                                            <li><a href="page-faq.html">FAQ</a></li>
+                                        </ul>
+                                        <div class="dropdown-image">
+                                            <img src="<?php echo base_url(); ?>assets/menu/img/photos/dropdown-about.jpg" alt="">
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><a href="<?php echo base_url(); ?>web">Offers</a></li>
+                            </ul>
+                        </nav>
+                        <div class="module left">
+                            <a href="menu-list-navigation.html" class="btn btn-outline-secondary"><span>Order</span></a>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" @click="panelCartToggle" class="module module-cart right">
+                            <span class="cart-icon">
+                                <i class="ti ti-shopping-cart"></i>
+                                <span class="notification">{{ productCount }}</span>
+                            </span>
+                            <span class="cart-value">${{ totalPrice }}</span>
                         </a>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <!-- Navigation -->
-                    <nav class="module module-navigation left mr-4">
-                        <ul id="nav-main" class="nav nav-main">
-                            <li>
-                                <a href="<?php echo base_url(); ?>menu/web">Home</a>
-                            </li>
-                            <li class="has-dropdown">
-                                <a href="#">About</a>
-                                <div class="dropdown-container">
-                                    <ul class="dropdown-mega">
-                                        <li><a href="page-about.html">About Us</a></li>
-                                        <li><a href="page-services.html">Services</a></li>
-                                        <li><a href="page-gallery.html">Gallery</a></li>
-                                        <li><a href="page-reviews.html">Reviews</a></li>
-                                        <li><a href="page-faq.html">FAQ</a></li>
-                                    </ul>
-                                    <div class="dropdown-image">
-                                        <img src="<?php echo base_url(); ?>assets/menu/img/photos/dropdown-about.jpg" alt="">
-                                    </div>
-                                </div>
-                            </li>
-                            <li><a href="<?php echo base_url(); ?>web">Offers</a></li>
-                        </ul>
-                    </nav>
-                    <div class="module left">
-                        <a href="menu-list-navigation.html" class="btn btn-outline-secondary"><span>Order</span></a>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <a href="#" class="module module-cart right" data-toggle="panel-cart">
-                        <span class="cart-icon">
-                            <i class="ti ti-shopping-cart"></i>
-                            <span class="notification">2</span>
-                        </span>
-                        <span class="cart-value">$32.98</span>
-                    </a>
-                </div>
             </div>
-        </div>
 
-    </header>
-    <!-- Header / End -->
+        </header>
+        <!-- Header / End -->
+        <input type="hidden" id="base_url" value="<?php echo base_url(); ?>">
+        <input type="hidden" id="restaurant_slug" value="<?php echo $restaurant_slug; ?>">
+        <!-- Header -->
+        <header id="header-mobile" class="light">
 
-    <!-- Header -->
-    <header id="header-mobile" class="light">
+            <div class="module module-nav-toggle">
+                <a href="#" id="nav-toggle" data-toggle="panel-mobile"><span></span><span></span><span></span><span></span></a>
+            </div>    
 
-        <div class="module module-nav-toggle">
-            <a href="#" id="nav-toggle" data-toggle="panel-mobile"><span></span><span></span><span></span><span></span></a>
-        </div>    
+            <div class="module module-logo">
+                <a href="<?php echo base_url(); ?>menu/web">
+                    <img src="<?php echo base_url(); ?>assets/menu/img/logo-horizontal-dark.svg" alt="">
+                </a>
+            </div>
 
-        <div class="module module-logo">
-            <a href="<?php echo base_url(); ?>menu/web">
-                <img src="<?php echo base_url(); ?>assets/menu/img/logo-horizontal-dark.svg" alt="">
+            <a href="#" class="module module-cart" data-toggle="panel-cart">
+                <i class="ti ti-shopping-cart"></i>
+                <span class="notification">2</span>
             </a>
-        </div>
 
-        <a href="#" class="module module-cart" data-toggle="panel-cart">
-            <i class="ti ti-shopping-cart"></i>
-            <span class="notification">2</span>
-        </a>
+        </header>
+        <!-- Header / End -->
 
-    </header>
-    <!-- Header / End -->
-
-    <!-- Content -->
-    <div id="content">
+        <!-- Content -->
+        <div id="content">
 
         <!-- Page Title -->
         <div class="page-title bg-dark dark">
@@ -138,143 +140,147 @@
                 <div class="row">
                     <div class="col-xl-4 push-xl-8 col-lg-5 push-lg-7">
                         <div class="shadow bg-white stick-to-content mb-4">
-                            <div class="bg-dark dark p-4"><h5 class="mb-0">You order</h5></div>
+                            <div class="bg-dark dark p-4"><h5 class="mb-0">My order</h5></div>
                             <table class="table-cart">
-                                <tr>
+                                <tr v-if="orderList.length > 0"
+                                    v-for="(order, key) in orderList"
+                                    :key="key">
                                     <td class="title">
-                                        <span class="name"><a href="#productModal" data-toggle="modal">Pizza Chicked BBQ</a></span>
-                                        <span class="caption text-muted">26”, deep-pan, thin-crust</span>
+                                        <span class="name"><a href="#productModal" data-toggle="modal">{{ order.food_name }}</a></span>
+                                        <span class="caption text-muted">{{ order.food_size_name}} ({{ order.food_weight }}g)</span>
                                     </td>
-                                    <td class="price">$9.82</td>
+                                    <td class="price">${{ order.food_price }}</td>
                                     <td class="actions">
                                         <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                                        <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
+                                        <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td class="title">
-                                        <span class="name"><a href="#productModal" data-toggle="modal">Beef Burger</a></span>
-                                        <span class="caption text-muted">Large (500g)</span>
-                                    </td>
-                                    <td class="price">$9.82</td>
-                                    <td class="actions">
-                                        <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                                        <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="title">
-                                        <span class="name"><a href="#productModal" data-toggle="modal">Extra Burger</a></span>
-                                        <span class="caption text-muted">Small (200g)</span>
-                                    </td>
-                                    <td class="price text-success">$0.00</td>
-                                    <td class="actions">
-                                        <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                                        <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="title">
-                                        <span class="name">Weekend 20% OFF</span>
-                                    </td>
-                                    <td class="price text-success">-$8.22</td>
-                                    <td class="actions"></td>
                                 </tr>
                             </table>
                             <div class="cart-summary">
                                 <div class="row">
                                     <div class="col-7 text-right text-muted">Order total:</div>
-                                    <div class="col-5"><strong>$21.02</strong></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-7 text-right text-muted">Devliery:</div>
-                                    <div class="col-5"><strong>$3.99</strong></div>
+                                    <div class="col-5"><strong>${{ totalPrice }}</strong></div>
                                 </div>
                                 <hr class="hr-sm">
-                                <div class="row text-md">
+                                <div class="row text-lg">
                                     <div class="col-7 text-right text-muted">Total:</div>
-                                    <div class="col-5"><strong>$24.21</strong></div>
+                                    <div class="col-5"><strong>${{ totalPrice }}</strong></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-8 pull-xl-4 col-lg-7 pull-lg-5">
-                        <div class="bg-white p-4 p-md-5 mb-4">
-                            <h4 class="border-bottom pb-4"><i class="ti ti-user mr-3 text-primary"></i>Basic informations</h4>
-                            <div class="row mb-5">
-                                <div class="form-group col-sm-6">
-                                    <label>Name:</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>Surename:</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>Street and number:</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>City:</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>Phone number:</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>E-mail address:</label>
-                                    <input type="email" class="form-control">
-                                </div>
-                            </div>
-
-                            <h4 class="border-bottom pb-4"><i class="ti ti-package mr-3 text-primary"></i>Delivery</h4>
-                            <div class="row mb-5">
-                                <div class="form-group col-sm-6">
-                                    <label>Delivery time:</label>
-                                    <div class="select-container">
-                                        <select class="form-control">
-                                            <option>As fast as possible</option>
-                                            <option>In one hour</option>
-                                            <option>In two hours</option>
-                                        </select>
+                        <form @submit.prevent="orderNow">
+                            <div class="bg-white p-4 p-md-5 mb-4">
+                                <h4 class="border-bottom pb-4"><i class="ti ti-user mr-3 text-primary"></i>Basic informations</h4>
+                                <div class="row mb-5">
+                                    <div class="form-group col-sm-6">
+                                        <label>Name:</label>
+                                        <input v-model="formData.customer_name" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_name }}</span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label>Surename:</label>
+                                        <input v-model="formData.customer_surname" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_surname }}</span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label>Street and number:</label>
+                                        <input v-model="formData.customer_street_no" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_street_no }}</span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label>City:</label>
+                                        <input v-model="formData.customer_city" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_city }}</span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label>Phone number:</label>
+                                        <input v-model="formData.customer_phone" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_phone }}</span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label>E-mail address:</label>
+                                        <input v-model="formData.customer_email" type="email" class="form-control">
+                                        <span class="text-danger">{{ errors.customer_email }}</span>
                                     </div>
                                 </div>
-                            </div>
 
-                            <h4 class="border-bottom pb-4"><i class="ti ti-wallet mr-3 text-primary"></i>Payment</h4>
-                            <div class="row text-lg">
-                                <div class="col-md-4 col-sm-6 form-group">
-                                    <label class="custom-control custom-radio">
-                                        <input type="radio" name="payment_type" class="custom-control-input">
-                                        <span class="custom-control-indicator"></span>
-                                        <span class="custom-control-description">PayPal</span>
-                                    </label>
+                                <h4 class="border-bottom pb-4"><i class="ti ti-package mr-3 text-primary"></i>Delivery</h4>
+                                <div class="row mb-5">
+                                    <div class="form-group col-sm-6">
+                                        <label>Delivery time:</label>
+                                        <div class="select-container">
+                                            <select v-model="formData.order_priority" class="form-control">
+                                                <option value="1" selected="selected">As fast as possible</option>
+                                                <option value="2">In one hour</option>
+                                                <option value="3">In two hours</option>
+                                            </select>
+                                            <span class="text-danger">{{ errors.order_priority }}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4 col-sm-6 form-group">
-                                    <label class="custom-control custom-radio">
-                                        <input type="radio" name="payment_type" class="custom-control-input">
-                                        <span class="custom-control-indicator"></span>
-                                        <span class="custom-control-description">Credit Card</span>
-                                    </label>
-                                </div>
-                                <div class="col-md-4 col-sm-6 form-group">
-                                    <label class="custom-control custom-radio">
-                                        <input type="radio" name="payment_type" class="custom-control-input">
-                                        <span class="custom-control-indicator"></span>
-                                        <span class="custom-control-description">Cash</span>
-                                    </label>
+
+                                <h4 class="border-bottom pb-4"><i class="ti ti-wallet mr-3 text-primary"></i>Payment</h4>
+                                <div class="row text-lg">
+                                    <div class="col-md-4 col-sm-6 form-group">
+                                        <label class="custom-control custom-radio">
+                                            <input type="radio" v-model="formData.payment_type" value="1" class="custom-control-input">
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">Cash</span>
+                                        </label>
+                                    </div>
+                                    <span class="text-danger">{{ errors.payment_type }}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="text-center">
-                            <button class="btn btn-primary btn-lg"><span>Order now!</span></button>
-                        </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg"><span>Order now!</span></button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
 
         </section>
+
+        <!-- Panel Cart -->
+    <div id="panel-cart">
+        <div class="panel-cart-container">
+            <div class="panel-cart-title">
+                <h5 class="title">My Cart</h5>
+                <button class="close" @click="hidePanelCart" data-toggle="panel-cart"><i class="ti ti-close"></i></button>
+            </div>
+            <div class="panel-cart-content">
+                <table class="table-cart">
+                    <tr v-if="orderList.length > 0"
+                        v-for="(order, key) in orderList"
+                        :key="key">
+                        <td class="title">
+                            <span class="name"><a href="#productModal" data-toggle="modal">{{ order.food_name }}</a></span>
+                            <span class="caption text-muted">{{ order.food_size_name}} ({{ order.food_weight }}g)</span>
+                        </td>
+                        <td class="price">${{ order.food_price }}</td>
+                        <td class="actions">
+                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
+                            <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
+                        </td>
+                    </tr>
+                </table>
+                <div class="cart-summary">
+                    <div class="row">
+                        <div class="col-7 text-right text-muted">Order total:</div>
+                        <div class="col-5"><strong>${{ totalPrice }}</strong></div>
+                    </div>
+                    <hr class="hr-sm">
+                    <div class="row text-lg">
+                        <div class="col-7 text-right text-muted">Total:</div>
+                        <div class="col-5"><strong>${{ totalPrice }}</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="<?php echo base_url(); ?>menu/<?php echo $restaurant_slug; ?>/checkout" class="panel-cart-action btn btn-secondary btn-block btn-lg"><span>Go to checkout</span></a>
+    </div>
 
         <!-- Footer -->
         <footer id="footer" class="bg-dark dark">
@@ -337,231 +343,33 @@
             <a href="#" id="back-to-top"><i class="ti ti-angle-up"></i></a>
 
         </footer>
-        <!-- Footer / End -->
-
+    <!-- Footer / End -->
     </div>
-    <!-- Content / End -->
+<!-- Content / End -->
 
-    <!-- Panel Cart -->
-    <div id="panel-cart">
-        <div class="panel-cart-container">
-            <div class="panel-cart-title">
-                <h5 class="title">Your Cart</h5>
-                <button class="close" data-toggle="panel-cart"><i class="ti ti-close"></i></button>
-            </div>
-            <div class="panel-cart-content">
-                <table class="table-cart">
-                    <tr>
-                        <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Pizza Chicked BBQ</a></span>
-                            <span class="caption text-muted">26”, deep-pan, thin-crust</span>
-                        </td>
-                        <td class="price">$9.82</td>
-                        <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Beef Burger</a></span>
-                            <span class="caption text-muted">Large (500g)</span>
-                        </td>
-                        <td class="price">$9.82</td>
-                        <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Extra Burger</a></span>
-                            <span class="caption text-muted">Small (200g)</span>
-                        </td>
-                        <td class="price text-success">$0.00</td>
-                        <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name">Weekend 20% OFF</span>
-                        </td>
-                        <td class="price text-success">-$8.22</td>
-                        <td class="actions"></td>
-                    </tr>
-                </table>
-                <div class="cart-summary">
-                    <div class="row">
-                        <div class="col-7 text-right text-muted">Order total:</div>
-                        <div class="col-5"><strong>$21.02</strong></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-7 text-right text-muted">Devliery:</div>
-                        <div class="col-5"><strong>$3.99</strong></div>
-                    </div>
-                    <hr class="hr-sm">
-                    <div class="row text-lg">
-                        <div class="col-7 text-right text-muted">Total:</div>
-                        <div class="col-5"><strong>$24.21</strong></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <a href="checkout.html" class="panel-cart-action btn btn-secondary btn-block btn-lg"><span>Go to checkout</span></a>
-    </div>
-
-    <!-- Panel Mobile -->
-    <nav id="panel-mobile">
-        <div class="module module-logo bg-dark dark">
-            <a href="#">
-                <img src="<?php echo base_url(); ?>assets/menu/img/logo-light.svg" alt="" width="88">
-            </a>
-            <button class="close" data-toggle="panel-mobile"><i class="ti ti-close"></i></button>
-        </div>
-        <nav class="module module-navigation"></nav>
-        <div class="module module-social">
-            <h6 class="text-sm mb-3">Follow Us!</h6>
-            <a href="#" class="icon icon-social icon-circle icon-sm icon-facebook"><i class="fa fa-facebook"></i></a>
-            <a href="#" class="icon icon-social icon-circle icon-sm icon-google"><i class="fa fa-google"></i></a>
-            <a href="#" class="icon icon-social icon-circle icon-sm icon-twitter"><i class="fa fa-twitter"></i></a>
-            <a href="#" class="icon icon-social icon-circle icon-sm icon-youtube"><i class="fa fa-youtube"></i></a>
-            <a href="#" class="icon icon-social icon-circle icon-sm icon-instagram"><i class="fa fa-instagram"></i></a>
-        </div>
-    </nav>
-
-    <!-- Body Overlay -->
-    <div id="body-overlay"></div>
-
+<!-- Panel Mobile -->
+<nav id="panel-mobile">
+<div class="module module-logo bg-dark dark">
+    <a href="#">
+        <img src="<?php echo base_url(); ?>assets/menu/img/logo-light.svg" alt="" width="88">
+    </a>
+    <button class="close" data-toggle="panel-mobile"><i class="ti ti-close"></i></button>
 </div>
+<nav class="module module-navigation"></nav>
+<div class="module module-social">
+    <h6 class="text-sm mb-3">Follow Us!</h6>
+    <a href="#" class="icon icon-social icon-circle icon-sm icon-facebook"><i class="fa fa-facebook"></i></a>
+    <a href="#" class="icon icon-social icon-circle icon-sm icon-google"><i class="fa fa-google"></i></a>
+    <a href="#" class="icon icon-social icon-circle icon-sm icon-twitter"><i class="fa fa-twitter"></i></a>
+    <a href="#" class="icon icon-social icon-circle icon-sm icon-youtube"><i class="fa fa-youtube"></i></a>
+    <a href="#" class="icon icon-social icon-circle icon-sm icon-instagram"><i class="fa fa-instagram"></i></a>
+</div>
+</nav>
 
-<!-- Modal / Product -->
-<div class="modal fade" id="productModal" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-header-lg dark bg-dark">
-                <div class="bg-image"><img src="<?php echo base_url(); ?>assets/menu/img/photos/modal-add.jpg" alt=""></div>
-                <h4 class="modal-title">Specify your dish</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="ti-close"></i></button>
-            </div>
-            <div class="modal-product-details">
-                <div class="row align-items-center">
-                    <div class="col-9">
-                        <h6 class="mb-0">Boscaiola Pasta</h6>
-                        <span class="text-muted">Pasta, Cheese, Tomatoes, Olives</span>
-                    </div>
-                    <div class="col-3 text-lg text-right">$9.00</div>
-                </div>
-            </div>
-            <div class="modal-body panel-details-container">
-                <!-- Panel Details / Size -->
-                <div class="panel-details">
-                    <h5 class="panel-details-title">
-                        <label class="custom-control custom-radio">
-                            <input name="radio_title_size" type="radio" class="custom-control-input">
-                            <span class="custom-control-indicator"></span>
-                        </label>
-                        <a href="#panelDetailsSize" data-toggle="collapse">Size</a>
-                    </h5>
-                    <div id="panelDetailsSize" class="collapse show">
-                        <div class="panel-details-content">
-                            <div class="form-group">
-                                <label class="custom-control custom-radio">
-                                    <input name="radio_size" type="radio" class="custom-control-input" checked>
-                                    <span class="custom-control-indicator"></span>
-                                    <span class="custom-control-description">Small - 100g ($9.99)</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-control custom-radio">
-                                    <input name="radio_size" type="radio" class="custom-control-input">
-                                    <span class="custom-control-indicator"></span>
-                                    <span class="custom-control-description">Medium - 200g ($14.99)</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-control custom-radio">
-                                    <input name="radio_size" type="radio" class="custom-control-input">
-                                    <span class="custom-control-indicator"></span>
-                                    <span class="custom-control-description">Large - 350g ($21.99)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Panel Details / Additions -->
-                <div class="panel-details">
-                    <h5 class="panel-details-title">
-                        <label class="custom-control custom-radio">
-                            <input name="radio_title_additions" type="radio" class="custom-control-input">
-                            <span class="custom-control-indicator"></span>
-                        </label>
-                        <a href="#panelDetailsAdditions" data-toggle="collapse">Additions</a>
-                    </h5>
-                    <div id="panelDetailsAdditions" class="collapse">
-                        <div class="panel-details-content">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input">
-                                            <span class="custom-control-indicator"></span>
-                                            <span class="custom-control-description">Tomato ($1.29)</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input">
-                                            <span class="custom-control-indicator"></span>
-                                            <span class="custom-control-description">Ham ($1.29)</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input">
-                                            <span class="custom-control-indicator"></span>
-                                            <span class="custom-control-description">Chicken ($1.29)</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input">
-                                            <span class="custom-control-indicator"></span>
-                                            <span class="custom-control-description">Cheese($1.29)</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input">
-                                            <span class="custom-control-indicator"></span>
-                                            <span class="custom-control-description">Bacon ($1.29)</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Panel Details / Other -->
-                <div class="panel-details">
-                    <h5 class="panel-details-title">
-                        <label class="custom-control custom-radio">
-                            <input name="radio_title_other" type="radio" class="custom-control-input">
-                            <span class="custom-control-indicator"></span>
-                        </label>
-                        <a href="#panelDetailsOther" data-toggle="collapse">Other</a>
-                    </h5>
-                    <div id="panelDetailsOther" class="collapse">
-                        <textarea cols="30" rows="4" class="form-control" placeholder="Put this any other informations..."></textarea>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="modal-btn btn btn-secondary btn-block btn-lg" data-dismiss="modal"><span>Add to Cart</span></button>
-        </div>
+<!-- Body Overlay -->
+<div id="body-overlay"></div>
     </div>
+
 </div>
 
 <!-- JS Plugins -->
@@ -579,6 +387,11 @@
 
 <!-- JS Core -->
 <script src="<?php echo base_url(); ?>assets/menu/js/core.js"></script>
+
+<script src="<?php echo base_url(); ?>assets/vue/vue.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/axios.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/sweetalert2.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/components/menu/web.js"></script>
 
 </body>
 

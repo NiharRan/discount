@@ -93,6 +93,38 @@ new Vue({
          self.errors = data.errors;
        }
     },
+    async changeFeatureRestaurant(restaurant) {
+      /**
+       * this method change restaurant's status
+       * @param feature_restaurant
+       * @response success
+       */
+      var formData = new FormData();
+      formData.append('feature_restaurant', restaurant.feature_restaurant);
+      formData.append('restaurant_id', restaurant.restaurant_id);
+
+      // send request to server
+      var {data} = await axios.post(base_url+'restaurant/change-feature-status', formData);
+      // if status updated
+      if (data.success) {
+        this.fetchRestaurants();
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Changes done!",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }else {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Already 12 restaurant exists as feature!",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    },
     async changeStatus(restaurant) {
       /**
        * this method change restaurant's status
@@ -100,7 +132,6 @@ new Vue({
        * @response success
        */
       var formData = new FormData();
-      var self = this;
       var statusMsg = restaurant.restaurant_status == 1 ? "Inactive" : "Active";
       formData.append('restaurant_status', restaurant.restaurant_status);
       formData.append('restaurant_id', restaurant.restaurant_id);
@@ -109,7 +140,7 @@ new Vue({
       var {data} = await axios.post(base_url+'restaurant/change-status', formData);
       // if status updated
       if (data.success) {
-        self.fetchrestaurants();
+        this.fetchRestaurants();
         Swal.fire({
           position: "top-end",
           icon: "success",
@@ -125,7 +156,7 @@ new Vue({
         this.templates = data.data;
       }
     },
-    fetchrestaurants() {
+    fetchRestaurants() {
       /**
        * this method fetch restaurants from server
        * based on search information
@@ -181,7 +212,7 @@ new Vue({
   },
   created() {
     // after page is created call those method
-    this.fetchrestaurants();
+    this.fetchRestaurants();
     this.fetchAllActiveTemplates();
     this.authPermissions();
 

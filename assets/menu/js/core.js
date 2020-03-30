@@ -30,6 +30,7 @@ var $body = $('body'),
 var $panelCartToggle = $('[data-toggle="panel-cart"]'),
     $panelCart = $('#panel-cart');
 
+
 function showPanelCart() {
     $panelCart.addClass('show');
     $bodyOverlay.fadeIn(400);

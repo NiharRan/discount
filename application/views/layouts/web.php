@@ -45,6 +45,7 @@
     <?php $this->load->view('web/includes/header'); ?>
 
     <div id="content" class="site-content">
+        <?php if(isset($pageHeaderCover)) $this->load->view($pageHeaderCover); ?>
         <!-- Page Header -->
         <?php if(isset($pageHeader)) $this->load->view($pageHeader); ?>
         
@@ -60,8 +61,11 @@
             <?php $this->load->view($content); ?>
 
             <!-- Sidebar -->
-            <?php $this->load->view('web/includes/sidebar'); ?>
-
+            <?php
+            if (isset($except) && $except != 'sidebar') {
+                $this->load->view('web/includes/sidebar');
+            }
+            ?>
             <!-- Most Popular Categories -->
             <?php if(isset($mostPopularCategories)) $this->load->view($mostPopularCategories); ?>
 

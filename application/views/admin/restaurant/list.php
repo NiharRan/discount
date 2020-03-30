@@ -9,7 +9,7 @@
                         <h3 class="mb-0"><i class="fas fa-store"></i> Restaurant Lists</h3>
                     </div>
                     <div class="form-group">
-                        <input type="text" @keyup="fetchrestaurants" v-model="search" class="form-control" placeholder="Search">
+                        <input type="text" @keyup="fetchRestaurants" v-model="search" class="form-control" placeholder="Search">
                     </div>
                     <div class="form-group mx-sm-3">
                         <!-- if logged in user has permission to create new restaurant -->
@@ -26,7 +26,7 @@
                         <th scope="col">Restaurant</th>
                         <th scope="col">Author</th>
                         <th scope="col">Tags</th>
-                        <th scope="col">Rating</th>
+                        <th scope="col">Menu</th>
                         <th scope="col">Status</th>
                         <th scope="col"></th>
                     </tr>
@@ -57,8 +57,10 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="mr-2" v-if=" restaurant.rating != '' ">{{ restaurant.rating }}(<span>{{ restaurant.totalRated }}</span>)</span>
+                                <!-- if categories is not empty -->
+                                <div class="btn-group" style="flex-wrap: wrap;" v-if="restaurant.categories.length > 0">
+                                    <!-- show all categories -->
+                                    <span class="badge badge-primary m-1" v-for="(category, k) in restaurant.categories" :key="k">{{ category.category_name }}</span>
                                 </div>
                             </td>
                             <td>
@@ -92,6 +94,14 @@
                                                 <i  class="fas" 
                                                     :class="[restaurant.restaurant_status == 1 ? 'fa-times text-danger' : 'fa-check text-success' ]">
                                                 </i> {{ restaurant.restaurant_status == 1 ? 'Inactive' : 'Active' }}
+                                        </a>
+                                        <a class="dropdown-item" 
+                                            v-if="hasPermission('edit', 'restaurant')" 
+                                            href="#" 
+                                            @click="changeFeatureRestaurant(restaurant)">
+                                                <i  class="fas" 
+                                                    :class="[restaurant.feature_restaurant == 1 ? 'fa-times text-danger' : 'fa-check text-success' ]">
+                                                </i> {{ restaurant.feature_restaurant == 1 ? 'Remove From' : 'Make' }} Feature
                                         </a>
                                         <a class="dropdown-item"
                                            href="#" v-if="hasPermission('create', 'offer')" @click="openOfferModal(restaurant)">

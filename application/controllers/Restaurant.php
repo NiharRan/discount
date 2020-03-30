@@ -663,7 +663,7 @@ class Restaurant extends CI_Controller {
 	 *
 	 * @return	true/false
 	 */
-	function changestatus()
+	function changeStatus()
 	{
 		// initialize response data
 		$jsonData = array('success' => false);
@@ -675,6 +675,34 @@ class Restaurant extends CI_Controller {
 		// if status changed 
 		if ($result) {
 			$jsonData['success'] = true;
+		}
+		// send response to client
+		echo json_encode($jsonData);
+	}
+
+	/**
+	 * restaurant status change by this method. 
+	 * if status change
+	 * Return success true 
+	 * otherwise false.
+	 *
+	 * @return	true/false
+	 */
+	function changeFeatureStatus()
+	{
+		// initialize response data
+		$jsonData = array('success' => false);
+		$feature_restaurant = $this->input->post('feature_restaurant');
+		$restaurant_id = $this->input->post('restaurant_id');
+		$restaurants = $this->db->select('*')->from('restaurants')->where('feature_restaurant', 1)->get();
+		if ($restaurants->num_rows() <= 12) {
+			// change status through this method
+			$result = $this->restaurant_model->change_feature_status($feature_restaurant, $restaurant_id);
+
+			// if status changed 
+			if ($result) {
+				$jsonData['success'] = true;
+			}
 		}
 		// send response to client
 		echo json_encode($jsonData);
@@ -693,6 +721,24 @@ class Restaurant extends CI_Controller {
 		// logged in user's restaurants will be fetched this method
 		$restaurant_creator = $this->session->userdata('user_id');
 		$restaurants = $this->restaurant_model->fetch_all_active_restaurants_of_user($restaurant_creator);
+
+		// if restaurants fond
+		if (count($restaurants) > 0) {
+			$jsonData['success'] = true;
+			$jsonData['data'] = $restaurants;
+		}
+
+		// send response to client
+		echo json_encode($jsonData);
+	}
+
+	function searchRestaurantsForCategory()
+	{
+		// initialize response data
+		$jsonData = array('success' => false, 'data' => array());
+		//restaurants will be fetched this method
+		$restaurant_name = $this->session->userdata('search');
+		$restaurants = $this->restaurant_model->fetch_some_restaurants($restaurant_name);
 
 		// if restaurants fond
 		if (count($restaurants) > 0) {

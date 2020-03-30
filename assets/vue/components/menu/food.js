@@ -8,11 +8,15 @@ new Vue({
       food_name: '',
       food_lowest_price: '',
       category: {},
-      food_tags: []
+      food_tags: [],
+      food_modal_banner: '',
+      food_banner: '',
     },
-    bannerUrl: base_url+"uploads/default/user/default-banner.png",
+    bannerUrl: base_url+"uploads/default/food/default-banner.jpg",
+    modalBannerUrl: base_url+"uploads/default/food/default-modal-banner.jpg",
     categories: [],
     foods: [],
+    restaurants: [],
     menu_tags: [],
     userPermissions: [],
     links: '',
@@ -24,6 +28,16 @@ new Vue({
   },
 
   methods: {
+    selectBanner(e) {
+      var file = e.target.files[0];
+      this.fData.food_banner = file;
+      this.bannerUrl = URL.createObjectURL(file);
+    },
+    selectModalBanner(e) {
+      var file = e.target.files[0];
+      this.fData.food_modal_banner = file;
+      this.modalBannerUrl = URL.createObjectURL(file);
+    },
     openModal(modalName) {
       // this method open modal which is id/class send by as param [modalName]
       $(modalName).modal('show');
@@ -54,6 +68,8 @@ new Vue({
       query.append("food_tags", foodTags);
       query.append("category_id", category_id);
       query.append("food_lowest_price", this.fData.food_lowest_price);
+      query.append("food_banner", this.fData.food_banner);
+      query.append("food_modal_banner", this.fData.food_modal_banner);
       // send api post request to server
       var {data} = await axios.post(base_url + "menu/foods/store", query);
       // if form validation done
@@ -96,6 +112,8 @@ new Vue({
       query.append("food_tags", foodTags);
       query.append("category_id", category_id);
       query.append("food_lowest_price", this.fData.food_lowest_price);
+      query.append("food_banner", this.fData.food_banner);
+      query.append("food_modal_banner", this.fData.food_modal_banner);
       // send api post request to server
       var {data} = await axios.post(base_url + "menu/foods/update", query);
       // if form validation done
@@ -153,8 +171,8 @@ new Vue({
       this.fData.food_id = food.food_id;
       this.fData.food_name = food.food_name;
       this.fData.food_lowest_price = food.food_lowest_price;
-      var category = this.categories.find(function (category) {
-        return category.category_id === food.category_id;
+      var category = this.categories.find(function (row) {
+        return row.category_id === food.category_id;
       })
       this.fData.food_tags = food.food_tags;
       this.fData.category = category;
@@ -180,13 +198,27 @@ new Vue({
     /**
      * this method 
      */
-    async fetchCategories() { // this method fetch all active categories
-        // call the api get request through url
-        var {data} =  await axios.get(base_url+'menu/categories/active');
+    async fetchCategories(restaurant) { // this method fetch all active categories
+      var formData = new FormData();
+      formData.append('restaurant_slug', restaurant.restaurant_slug);
+        // call the api post request through url
+        var {data} =  await axios.post(base_url+'menu/categories/active', formData);
         if (data.success) {
           // if data is found
           // store them
           this.categories = data.data;
+      }
+    },
+    async fetchRestaurants(query='') {
+      this.isFetching = true;
+      if (query.length > 2) {
+        var fData = new FormData();
+        fData.append('search', query);
+        const response = await axios.get(base_url+'restaurants/search', fData);
+        if (response.status === 200) {
+          this.restaurants = response.data.data;
+          this.isFetching = false;
+        }
       }
     },
     async getPaginateData(url, data) { //this method fetch foods 
@@ -208,7 +240,6 @@ new Vue({
        * @response success
        */
       var fData = new FormData();
-      var self = this;
       var statusMsg = food.food_status == 1 ? "Inactive" : "Active";
       fData.append('food_status', food.food_status);
       fData.append('food_id', food.food_id);
@@ -217,7 +248,7 @@ new Vue({
       var {data} = await axios.post(base_url+'menu/foods/change-status', fData);
       // if status updated
       if (data.success) {
-        self.fetchFoods();
+        this.fetchFoods();
         Swal.fire({
           position: "top-end",
           icon: "success",
@@ -266,7 +297,7 @@ new Vue({
   created() {
     // after page is created call those method
     this.fetchFoods();
-    this.fetchCategories();
+    this.fetchRestaurants();
     this.authPermissions();
 
     var self = this;

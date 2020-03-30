@@ -5,10 +5,12 @@ new Vue({
   data: {
     formData: {
       category_name: '',
-      category_id: ''
+      category_id: '',
+      restaurant: {}
     },
     options: [],
     categories: [],
+    restaurants: [],
     userPermissions: [],
     links: '',
     search: '',
@@ -16,6 +18,7 @@ new Vue({
         category_name: ""
     },
     isLoading: false,
+    isFetching: false
   },
 
   methods: {
@@ -32,57 +35,62 @@ new Vue({
       // clean formData object
       this.formData.category_name = '';
       this.formData.category_id = '';
+      this.formData.restaurant = {};
       // close modal
       $(modalName).modal("hide");
     },
     async store(){
       this.isLoading = true;
-        // store vue object to self variable
-        // if category form is not empty
-        if (this.formData.category_name.length > 0) {
-          // make loading icon visible
-          this.isLoading = true;
-          var data = new FormData();
-          // add category name array to formData object
-          data.append("category_name", this.formData.category_name);
-          // send api post request to server
-          var {data} = await axios.post(base_url + "menu/categories/store", data)
-          // if data stored in server
-          if (data.success) {
-            this.cleanForm('#categoryCreateModal');
-            // show success message
-            Swal.fire({
-              position: "top-end",
-              icon: "success",
-              title: "Category stored successfully",
-              showConfirmButton: false,
-              timer: 1500
-            });
-          } else {
-              // if not successful
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!"
-            });
-          }
-        }else {
-          this.isLoading = false;
-            /**
-             * if required field is empty
-             * show set error message
-             */
-            if (this.formData.category_name == "") {
-                this.errors.category_name = "Category name is required";
-            }
-        }
+      // store vue object to self variable
+      // make loading icon visible
+      this.isLoading = true;
+      var data = new FormData();
+      // add category name array to formData 
+      var restaurant_id = this.formData.restaurant['restaurant_id'] === undefined ? '' : this.formData.restaurant.restaurant_id;
+      data.append("category_name", this.formData.category_name);
+      data.append("restaurant_id", restaurant_id);
+      
+      // send api post request to server
+      var {data} = await axios.post(base_url + "menu/categories/store", data)
+      if (data.check) {
+
+        /**
+         * if data validation done
+         * check data updated or not
+         */
+        // if data stored in server
+      if (data.success) {
+        this.cleanForm('#categoryCreateModal');
+        // show success message
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Category stored successfully",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else {
+          // if not successful
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!"
+        });
+      }
+      } else {
+        this.isLoading = false;
+        // if form-validation field fetch error messages
+        this.errors = data.errors;
+      }
     },
     async update() {
       var data = new FormData();
       this.isLoading = true;
       // add category name and id to formData object
+      var restaurant_id = this.formData.restaurant['restaurant_id'] === undefined ? '' : this.formData.restaurant.restaurant_id;
       data.append("category_name", this.formData.category_name);
       data.append("category_id", this.formData.category_id);
+      data.append("restaurant_id", restaurant_id);
 
       // send api request to server
       var {data} = await axios.post(base_url + "menu/categories/update", data)
@@ -116,11 +124,12 @@ new Vue({
         this.errors = data.errors;
       }
     },
-    edit(category) {
+    async openCategoryEditModel(category) {
       // open category edit modal
       this.openModal('#categoryEditModal');
       this.formData.category_name = category.category_name;
       this.formData.category_id = category.category_id;
+      this.formData.restaurant = category.restaurant;
     },
     async remove(id) {
       var result = await Swal.fire({
@@ -225,6 +234,18 @@ new Vue({
       }
       return status;
     },
+    async fetchRestaurants(query) {
+      this.isFetching = true;
+      if (query.length > 2) {
+        var fData = new FormData();
+        fData.append('search', query);
+        const response = await axios.get(base_url+'restaurants/search', fData);
+        if (response.status === 200) {
+          this.restaurants = response.data.data;
+          this.isFetching = false;
+        }
+      }
+    }
   },
   created() {
     // after page is created call those method

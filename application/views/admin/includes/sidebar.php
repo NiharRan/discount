@@ -81,6 +81,15 @@
               </a>
             </li>
             <?php } ?>
+
+
+            <?php if($this->permission->has_permission('order', 'list-view')) {?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo site_url('orders'); ?>">
+              <i class="fas fa-store text-teal"></i> <span class="nav-link-text">Orders</span>
+              </a>
+            </li>
+            <?php } ?>
           </ul>
           <h6 class="navbar-heading text-muted">Setting</h6>
           <ul class="navbar-nav mb-md-3">
@@ -99,15 +108,6 @@
             <li class="nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>settings/permissions">
               <i class="fas fa-store text-green"></i> Permissions
-              </a>
-            </li>
-            <?php }?>
-
-            <!-- if user has permission to view restaurant list -->
-            <?php if($this->permission->has_permission('restaurant', 'list-view')) {?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?php echo base_url(); ?>settings/restaurants">
-              <i class="fas fa-store text-green"></i> Restaurants
               </a>
             </li>
             <?php }?>

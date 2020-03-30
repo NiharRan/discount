@@ -35,8 +35,6 @@ new Vue({
       return moment(date).format("YYYY-MM-DD");
     },
     async update(){
-      // update vue object to self veriable
-      var self = this;
       var formData = new FormData();
       // add user info to formData object
 
@@ -44,24 +42,24 @@ new Vue({
        * convert tags object array to tag name array
        * exp. [1, 2, 3, 4]
        */
-      var tags = self.formData.tags.map(function (tag) {
+      var tags = this.formData.tags.map(function (tag) {
         return tag.tag_id
       });
 
-      formData.append("restaurant_moto", self.formData.restaurant_moto);
-      formData.append("restaurant_id", self.formData.restaurant_id);
-      formData.append("restaurant_name", self.formData.restaurant_name);
-      formData.append("restaurant_contact_number", self.formData.restaurant_contact_number);
-      formData.append("restaurant_email", self.formData.restaurant_email);
-      formData.append("restaurant_address", self.formData.restaurant_address);
-      formData.append("restaurant_open_at", self.formData.restaurant_open_at); // Exp: 21:31:45
-      formData.append("restaurant_close_at", self.formData.restaurant_close_at); // Exp: 21:31:45
-      formData.append("restaurant_establish_date", self.formatDate(self.formData.restaurant_establish_date)); // Exp: 21-01-2020
-      formData.append("restaurant_banner", self.formData.restaurant_banner);
-      formData.append("restaurant_logo", self.formData.restaurant_logo);
+      formData.append("restaurant_moto", this.formData.restaurant_moto);
+      formData.append("restaurant_id", this.formData.restaurant_id);
+      formData.append("restaurant_name", this.formData.restaurant_name);
+      formData.append("restaurant_contact_number", this.formData.restaurant_contact_number);
+      formData.append("restaurant_email", this.formData.restaurant_email);
+      formData.append("restaurant_address", this.formData.restaurant_address);
+      formData.append("restaurant_open_at", this.formData.restaurant_open_at); // Exp: 21:31:45
+      formData.append("restaurant_close_at", this.formData.restaurant_close_at); // Exp: 21:31:45
+      formData.append("restaurant_establish_date", this.formatDate(this.formData.restaurant_establish_date)); // Exp: 21-01-2020
+      formData.append("restaurant_banner", this.formData.restaurant_banner);
+      formData.append("restaurant_logo", this.formData.restaurant_logo);
       formData.append("tags", tags);
-      formData.append("restaurant_new_banner", self.restaurant_new_banner);
-      formData.append("restaurant_new_logo", self.restaurant_new_logo);
+      formData.append("restaurant_new_banner", this.restaurant_new_banner);
+      formData.append("restaurant_new_logo", this.restaurant_new_logo);
       // send api post request to server
       const { data } = await axios.post(base_url + "restaurant/update", formData);
       // if form validation done
@@ -86,22 +84,20 @@ new Vue({
             });
         }
       } else {
-        self.errors = data.errors;
+        this.errors = data.errors;
       }
     },
     async fetchRestaurant(slug) {
-      var self = this;
       // call request to server to fetch restaurant info
       var { data } = await axios.get(base_url+'restaurant/edit/'+slug);
       if (data.success) {
-        self.formData = data.data;
+        this.formData = data.data;
       }
     },
     async fetchtags() {
-      var self = this;
       var {data} = await axios.get(base_url+'tag/allactivetags');
       if (data.success) {
-        self.tags = data.data;
+        this.tags = data.data;
       }
     }
   },

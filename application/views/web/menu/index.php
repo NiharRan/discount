@@ -28,6 +28,7 @@
 
 <!-- CSS Theme -->
 <link id="theme" rel="stylesheet" href="<?php echo base_url(); ?>assets/menu/css/themes/theme-beige.min.css" />
+<link id="theme" rel="stylesheet" href="<?php echo base_url(); ?>assets/menu/css/style.css" />
 
 </head>
 
@@ -36,6 +37,7 @@
 <!-- Body Wrapper -->
 <div id="body-wrapper" class="animsition">
 
+    <div id="app">
     <!-- Header -->
     <header id="header" class="light">
 
@@ -79,12 +81,12 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <a href="#" class="module module-cart right" data-toggle="panel-cart">
+                    <a href="#" @click="panelCartToggle" class="module module-cart right">
                         <span class="cart-icon">
                             <i class="ti ti-shopping-cart"></i>
-                            <span class="notification">2</span>
+                            <span class="notification">{{ productCount }}</span>
                         </span>
-                        <span class="cart-value">$32.98</span>
+                        <span class="cart-value">${{ totalPrice }}</span>
                     </a>
                 </div>
             </div>
@@ -92,7 +94,8 @@
 
     </header>
     <!-- Header / End -->
-
+    <input type="hidden" id="base_url" value="<?php echo base_url(); ?>">
+    <input type="hidden" id="restaurant_slug" value="<?php echo $restaurant_slug; ?>">
     <!-- Header -->
     <header id="header-mobile" class="light">
 
@@ -137,163 +140,146 @@
                         <!-- Menu Navigation -->
                         <nav id="menu-navigation" class="stick-to-content" data-local-scroll>
                             <ul class="nav nav-menu bg-dark dark">
-                                <?php
-                                if (count($categories) > 0) {
-                                    foreach ($categories as $category) {
-                                        echo '<li><a href="#'.ucfirst($category['category_name']).'">'.$category['category_name'].'</a></li>';
-                                    }
-                                }
-                                ?>
+                                <li v-if="categories.length > 0" 
+                                    v-for="(category, key) in categories" 
+                                    :key="key">
+                                        <a :href="['#'+category.category_name]"> {{ category.category_name }}</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
                     <div class="col-md-9">
-                        
-                        <?php
-                        if (count($categories) > 0) {
-                            foreach ($categories as $category) { ?>
-                                <div id="<?php echo ucfirst($category['category_name']); ?>" class="menu-category">
-                                    <div class="menu-category-title">
-                                        <div class="bg-image"><img src="<?php echo base_url(); ?>uploads/category/menu-title-<?php echo $category['category_name']; ?>.jpg" alt=""></div>
-                                        <h2 class="title"><?php echo ucfirst($category['category_name']); ?></h2>
-                                    </div>
-                                    <div class="menu-category-content">
-                                        <!-- Menu Item -->
-                                        
-                                        <?php
-                                        if (count($category['foods']) > 0) {
-                                            foreach ($category['foods'] as $food) { ?>
-                                                <div class="menu-item menu-list-item">
-                                                    <div class="row align-items-center">
-                                                        <div class="col-sm-6 mb-2 mb-sm-0">
-                                                            <h6 class="mb-0"><?php echo $food['food_name']; ?></h6>
-                                                            <span class="text-muted text-sm">
-                                                            <?php
-                                                                $tags = '';
-                                                                if (count($food['food_tags']) > 0) {
-                                                                    foreach ($food['food_tags'] as $food_tag) {
-                                                                        $tags .= ucfirst($food_tag['menu_tag_name']).', ';
-                                                                    }
-                                                                    $tags = rtrim($tags, ', ');
-                                                                    echo $tags;
-                                                                }
-                                                            ?>
-                                                            </span>
-                                                        </div>
-                                                        <div class="col-sm-6 text-sm-right">
-                                                            <span class="text-md mr-4"><span class="text-muted">from</span> $<?php echo $food['food_lowest_price']; ?></span>
-                                                            <button class="btn btn-outline-secondary btn-sm" data-target="#productModal" data-toggle="modal"><span>Add to cart</span></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        <div v-if="categories.length > 0" v-for="(category, key) in categories" :key="key" :id="category.category_name" class="menu-category">
+                            <div class="menu-category-title">
+                                <div class="bg-image">
+                                    <img :src="['<?php echo base_url(); ?>uploads/category/menu-title-'+category.category_name+'.jpg']" alt="">
+                                </div>
+                                <h2 class="title" style="text-transform: capitalize;">{{ category.category_name }}</h2>
+                            </div>
+                            <div class="menu-category-content">
+                                <!-- Menu Item -->
+                                <div 
+                                    v-if="category.foods.length > 0" 
+                                    v-for="(food, index) in category.foods"  
+                                    :key="index"
+                                    class="menu-item menu-list-item">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm-6 mb-2 mb-sm-0">
+                                            <h6 class="mb-0">{{ food.food_name }}</h6>
+                                            <span 
+                                                v-if="food.food_tags.length > 0"
+                                                v-for="(food_tag, tag_key) in food.food_tags"
+                                                class="text-muted text-sm"
+                                                style="text-transform: capitalize;">
+                                                {{ food_tag.menu_tag_name }}
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-6 text-sm-right">
+                                            <span class="text-md mr-4"><span class="text-muted">from</span> ${{ food.food_lowest_price }}</span>
+                                            <button class="btn btn-outline-secondary btn-sm" @click="showFoodInfo(food)" data-toggle="modal"><span>Add to cart</span></button>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                                <!-- Modal / Product -->
-                                                <div class="modal fade" id="productModal" role="dialog">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header modal-header-lg dark bg-dark">
-                                                                <div class="bg-image"><img src="<?php echo base_url(); ?>assets/menu/img/photos/modal-add.jpg" alt=""></div>
-                                                                <h4 class="modal-title">Specify your dish</h4>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="ti-close"></i></button>
-                                                            </div>
-                                                            <div class="modal-product-details">
-                                                                <div class="row align-items-center">
-                                                                    <div class="col-9">
-                                                                        <h6 class="mb-0"><?php echo $food['food_name']; ?></h6>
-                                                                        <span class="text-muted"><?php echo $tags; ?></span>
-                                                                    </div>
-                                                                    <div class="col-3 text-lg text-right">$<?php echo $food['food_lowest_price']; ?></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-body panel-details-container">
-                                                                <!-- Panel Details / Size -->
-                                                                <div class="panel-details">
-                                                                    <h5 class="panel-details-title">
-                                                                        <label class="custom-control custom-radio">
-                                                                            <input name="radio_title_size" type="radio" class="custom-control-input">
-                                                                            <span class="custom-control-indicator"></span>
-                                                                        </label>
-                                                                        <a href="#panelDetailsSize" data-toggle="collapse">Size</a>
-                                                                    </h5>
-                                                                    <div id="panelDetailsSize" class="collapse show">
-                                                                        <div class="panel-details-content">
-                                                                            
-                                                                            <?php
-                                                                            if (count($food['food_prices']) > 0) {
-                                                                                foreach ($food['food_prices'] as $food_price) { ?>
-                                                                                <div class="form-group">
-                                                                                    <label class="custom-control custom-radio">
-                                                                                        <input name="radio_size" type="radio" class="custom-control-input" checked>
-                                                                                        <span class="custom-control-indicator"></span>
-                                                                                        <span class="custom-control-description"><?php echo $food_price['food_size']['food_size_name']; ?> - <?php echo $food_price['food_weight']; ?>g ($<?php echo $food_price['food_price']; ?>)</span>
-                                                                                    </label>
-                                                                                </div>
-                                                                            <?php }
-                                                                            }
-                                                                            ?>
-                                                                            
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- Panel Details / Additions -->
-                                                                <div class="panel-details">
-                                                                    <h5 class="panel-details-title">
-                                                                        <label class="custom-control custom-radio">
-                                                                            <input name="radio_title_additions" type="radio" class="custom-control-input">
-                                                                            <span class="custom-control-indicator"></span>
-                                                                        </label>
-                                                                        <a href="#panelDetailsAdditions" data-toggle="collapse">Additions</a>
-                                                                    </h5>
-                                                                    <div id="panelDetailsAdditions" class="collapse">
-                                                                        <div class="panel-details-content">
-                                                                            <div class="row">
-                                                                                <div class="col-sm-6">
-                                                                                <?php
-                                                                                    if (count($aditionals) > 0) {
-                                                                                        foreach ($aditionals as $aditional) { ?>
-                                                                                            <div class="form-group">
-                                                                                                <label class="custom-control custom-checkbox">
-                                                                                                    <input type="checkbox" class="custom-control-input">
-                                                                                                    <span class="custom-control-indicator"></span>
-                                                                                                    <span class="custom-control-description"><?php echo $aditional['food_aditional_name']; ?> ($<?php echo $aditional['food_aditional_price']; ?>)</span>
-                                                                                                </label>
-                                                                                            </div>  
-                                                                                    <?php }   
-                                                                                    }
-                                                                                ?>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <!-- Panel Details / Other -->
-                                                                <div class="panel-details">
-                                                                    <h5 class="panel-details-title">
-                                                                        <label class="custom-control custom-radio">
-                                                                            <input name="radio_title_other" type="radio" class="custom-control-input">
-                                                                            <span class="custom-control-indicator"></span>
-                                                                        </label>
-                                                                        <a href="#panelDetailsOther" data-toggle="collapse">Other</a>
-                                                                    </h5>
-                                                                    <div id="panelDetailsOther" class="collapse">
-                                                                        <textarea cols="30" rows="4" class="form-control" placeholder="Put this any other informations..."></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <button type="button" class="modal-btn btn btn-secondary btn-block btn-lg" data-dismiss="modal"><span>Add to Cart</span></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        <?php }
-                                        }
-                                        ?>
-                                        
+        <!-- Modal / Product -->
+        <div class="modal fade" id="productModal" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-lg dark bg-dark">
+                        <div class="bg-image"><img src="<?php echo base_url(); ?>assets/menu/img/photos/modal-add.jpg" alt=""></div>
+                        <h4 class="modal-title">Specify your dish</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="ti-close"></i></button>
+                    </div>
+                    <div class="modal-product-details">
+                        <div class="row align-items-center">
+                            <div class="col-9">
+                                <h6 class="mb-0">{{ formData.food_name }}</h6>
+                                <input type="hidden" v-model="formData.tag_ids">
+                                <span class="text-muted">{{ formData.tag_names }}</span>
+                            </div>
+                            <div class="col-3 text-lg text-right">${{ formData.food_lowest_price }}</div>
+                        </div>
+                    </div>
+                    <div class="modal-body panel-details-container">
+                        <!-- Panel Details / Size -->
+                        <div class="panel-details">
+                            <h5 class="panel-details-title">
+                                <label class="custom-control custom-radio">
+                                    <input name="radio_title_size" type="radio" class="custom-control-input">
+                                    <span class="custom-control-indicator"></span>
+                                </label>
+                                <a href="#panelDetailsSize" data-toggle="collapse">Size</a>
+                            </h5>
+                            <div id="panelDetailsSize" class="collapse show">
+                                <div class="panel-details-content">
+                                    <div 
+                                        v-if="formData.food_prices.length > 0"
+                                        v-for="(food_price, fp_key) in formData.food_prices" 
+                                        :key="fp_key"
+                                        class="form-check">
+                                        <label>
+                                            <input v-model="formData.food_price_id"
+                                                :value="food_price.food_price_id" 
+                                                type="radio">
+                                            <span class="label-text">{{ food_price.food_size.food_size_name }} - {{ food_price.food_weight }}g (${{ food_price.food_price }})</span>
+                                        </label>
                                     </div>
                                 </div>
-                        <?php }
-                        }
-                        ?>
+                            </div>
+                        </div>
+                        <!-- Panel Details / Additions -->
+                        <div class="panel-details">
+                            <h5 class="panel-details-title">
+                                <label class="custom-control custom-radio">
+                                    <input name="radio_title_additions" type="radio" class="custom-control-input">
+                                    <span class="custom-control-indicator"></span>
+                                </label>
+                                <a href="#panelDetailsAdditions" data-toggle="collapse">Additions</a>
+                            </h5>
+                            <div id="panelDetailsAdditions" class="collapse">
+                                <div class="panel-details-content">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div 
+                                                v-if="aditionals.length > 0"
+                                                v-for="(aditional, a_key) in aditionals" 
+                                                :key="a_key"
+                                                class="form-check">
+                                                <label>
+                                                    <input 
+                                                        type="checkbox" 
+                                                        class="food-aditional-id"
+                                                        v-model="formData.food_aditional_ids"
+                                                        :value="aditional.food_aditional_id">
+                                                    <span class="label-text">{{ aditional.food_aditional_name }}(${{ aditional.food_aditional_price }})</span>
+                                                </label>
+                                            </div>  
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Panel Details / Other -->
+                        <div class="panel-details">
+                            <h5 class="panel-details-title">
+                                <label class="custom-control custom-radio">
+                                    <input name="radio_title_other" type="radio" class="custom-control-input">
+                                    <span class="custom-control-indicator"></span>
+                                </label>
+                                <a href="#panelDetailsOther" data-toggle="collapse">Other</a>
+                            </h5>
+                            <div id="panelDetailsOther" class="collapse">
+                                <textarea v-model="formData.order_description" cols="30" rows="4" class="form-control" placeholder="Put this any other informations..."></textarea>
+                            </div>
+                        </div>
                     </div>
+                    <button type="button" @click="addToCart" class="add-cart modal-btn btn btn-secondary btn-block btn-lg"><span>Add to Cart</span></button>
                 </div>
             </div>
         </div>
@@ -368,70 +354,39 @@
     <div id="panel-cart">
         <div class="panel-cart-container">
             <div class="panel-cart-title">
-                <h5 class="title">Your Cart</h5>
-                <button class="close" data-toggle="panel-cart"><i class="ti ti-close"></i></button>
+                <h5 class="title">My Cart</h5>
+                <button class="close" @click="hidePanelCart" data-toggle="panel-cart"><i class="ti ti-close"></i></button>
             </div>
             <div class="panel-cart-content">
                 <table class="table-cart">
-                    <tr>
+                    <tr v-if="orderList.length > 0"
+                        v-for="(order, key) in orderList"
+                        :key="key">
                         <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Pizza Chicked BBQ</a></span>
-                            <span class="caption text-muted">26”, deep-pan, thin-crust</span>
+                            <span class="name"><a href="#productModal" data-toggle="modal">{{ order.food_name }}</a></span>
+                            <span class="caption text-muted">{{ order.food_size_name}} ({{ order.food_weight }}g)</span>
                         </td>
-                        <td class="price">$9.82</td>
+                        <td class="price">${{ order.food_price }}</td>
                         <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
+                            <a href="#" @click="showFoodInfoForEdit(order)" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
+                            <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Beef Burger</a></span>
-                            <span class="caption text-muted">Large (500g)</span>
-                        </td>
-                        <td class="price">$9.82</td>
-                        <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name"><a href="#productModal" data-toggle="modal">Extra Burger</a></span>
-                            <span class="caption text-muted">Small (200g)</span>
-                        </td>
-                        <td class="price text-success">$0.00</td>
-                        <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
-                            <a href="#" class="action-icon"><i class="ti ti-close"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title">
-                            <span class="name">Weekend 20% OFF</span>
-                        </td>
-                        <td class="price text-success">-$8.22</td>
-                        <td class="actions"></td>
                     </tr>
                 </table>
                 <div class="cart-summary">
                     <div class="row">
                         <div class="col-7 text-right text-muted">Order total:</div>
-                        <div class="col-5"><strong>$21.02</strong></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-7 text-right text-muted">Devliery:</div>
-                        <div class="col-5"><strong>$3.99</strong></div>
+                        <div class="col-5"><strong>${{ totalPrice }}</strong></div>
                     </div>
                     <hr class="hr-sm">
                     <div class="row text-lg">
                         <div class="col-7 text-right text-muted">Total:</div>
-                        <div class="col-5"><strong>$24.21</strong></div>
+                        <div class="col-5"><strong>${{ totalPrice }}</strong></div>
                     </div>
                 </div>
             </div>
         </div>
-        <a href="<?php echo base_url(); ?>menu/web/checkout" class="panel-cart-action btn btn-secondary btn-block btn-lg"><span>Go to checkout</span></a>
+        <a href="<?php echo base_url(); ?>menu/<?php echo $restaurant_slug; ?>/checkout" class="panel-cart-action btn btn-secondary btn-block btn-lg"><span>Go to checkout</span></a>
     </div>
 
     <!-- Panel Mobile -->
@@ -455,6 +410,7 @@
 
     <!-- Body Overlay -->
     <div id="body-overlay"></div>
+    </div>
 
 </div>
 
@@ -474,6 +430,11 @@
 
 <!-- JS Core -->
 <script src="<?php echo base_url(); ?>assets/menu/js/core.js"></script>
+
+<script src="<?php echo base_url(); ?>assets/vue/vue.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/axios.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/sweetalert2.js"></script>
+<script src="<?php echo base_url(); ?>assets/vue/components/menu/web.js"></script>
 
 </body>
 

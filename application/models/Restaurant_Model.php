@@ -97,9 +97,13 @@ class Restaurant_Model extends CI_Model
 		$query = $this->db->limit($limit, $start)->get()->result_array();
 		
 		foreach ($query as $key => $restaurant) {
-			// this method fetch all tags of a restaurant
+			// this metho dfetch all tags of a restaurant
 			$tags = $this->tag_model->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
-			$query[$key]['tags'] = $tags;
+            $query[$key]['tags'] = $this->global_model->belong_to_many('restaurant_tags', 'tags', 'restaurant_id', $restaurant['restaurant_id'], 'tag_id');
+
+			// this metho dfetch all tags of a restaurant
+			$categories = $this->global_model->has_many('categories', 'restaurant_id', $restaurant['restaurant_id']);
+			$query[$key]['categories'] = $categories;
 
 			// this method fetch all tags of a restaurant
 			$ratings = $this->global_model->with('ratings', 'restaurant_id', $restaurant['restaurant_id']);
@@ -155,6 +159,20 @@ class Restaurant_Model extends CI_Model
 						->update($this->table);
 	}
 
+	/**
+     * this method update restaurant status
+     * @param restaurant_status
+     * @param restaurant_id
+     * @return true/false
+     */
+	function change_feature_status($status, $id)
+	{
+		$status = $status == 1 ? 0 : 1;
+		return $this->db->set('feature_restaurant', $status)
+						->where('restaurant_id', $id)
+						->update($this->table);
+	}
+
 	 /**
      * this method fetch restaurant info on condition
      * @return restaurantInfo object 
@@ -180,7 +198,11 @@ class Restaurant_Model extends CI_Model
         foreach ($query as $key => $restaurant) {
             // this metho dfetch all tags of a restaurant
 			$tags = $this->tag_model->fetch_all_tags_of_restaurant($restaurant['restaurant_id']);
-			$query[$key]['tags'] = $tags;
+            $query[$key]['tags'] = $this->global_model->belong_to_many('restaurant_tags', 'tags', 'restaurant_id', $restaurant['restaurant_id'], 'tag_id');
+
+			// this metho dfetch all tags of a restaurant
+			$categories = $this->global_model->has_many('categories', 'restaurant_id', $restaurant['restaurant_id']);
+			$query[$key]['categories'] = $categories;
 
 			// this metho dfetch all tags of a restaurant
 			$ratings = $this->global_model->with('ratings', 'restaurant_id', $restaurant['restaurant_id']);
@@ -241,6 +263,22 @@ class Restaurant_Model extends CI_Model
 
 
 	/**
+	 * this method fetch restaurants by searching
+	 * @param restaurant_creator
+	 * @return restaurant
+	 */
+	function fetch_some_restaurants($restaurant_name)
+	{
+		return $this->db->select('*')
+						->from($this->table)
+						->like('restaurant_name', $restaurant_name)
+						->limit(5)
+						->get()
+						->result_array();
+	}
+
+
+	/**
 	 * this method fetch restaurants by tag
 	 * @param tag_id
 	 * @return restaurant
@@ -256,6 +294,25 @@ class Restaurant_Model extends CI_Model
 						))
 						->get()
 						->result_array();
+	}
+
+
+	function fetch_restaurants_by_key($key)
+	{
+		return $this->db->select('restaurants.*')
+						->from('restaurants')
+						->where("restaurant_name LIKE '$key%'")
+						->get()
+						->result_array();
+	}
+
+	function count_restaurants_by_key($key)
+	{
+		return $this->db->select('restaurants.*')
+						->from('restaurants')
+						->where("restaurant_name LIKE '$key%'")
+						->get()
+						->num_rows();
 	}
 
 }

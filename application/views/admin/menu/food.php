@@ -73,7 +73,7 @@
     </div>
     <!-- food Create Modal -->
     <div class="modal fade" id="foodCreateModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="foodEditModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title" style="flex: 1;">Create new food
@@ -110,6 +110,26 @@
 
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
+                                            <label class="form-control-label">Restaurant</label>
+                                            <multiselect 
+                                                v-model="fData.restaurant" 
+                                                label="restaurant_name" 
+                                                track-by="restaurant_name" 
+                                                placeholder="Type to search" 
+                                                :options="restaurants" 
+                                                :searchable="true" 
+                                                :loading="isFetching" 
+                                                :options-limit="300" 
+                                                :limit="3" 
+                                                :max-height="600" 
+                                                :hide-selected="true" 
+                                                @search-change="fetchRestaurants"
+                                                @input="fetchCategories">
+                                            </multiselect>
+                                            <!-- if restaurant_id field is empty and try to submit show error message -->
+                                            <small class="text-danger">{{ errors.restaurant_id }}</small>
+                                        </div>
+                                        <div class="form-group">
                                             <label class="form-control-label">Category</label>
                                             <multiselect 
                                                 v-model="fData.category" 
@@ -129,7 +149,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 col-sm-12"></div>
+                            <div class="col-md-4 col-sm-12">
+                                <div class="banner-logo-upload-box width-full mb-4">
+                                    <img :src="bannerUrl" alt="">
+                                    <label class="btn-pill">
+                                        <i class="fas fa-camera"></i>
+                                        <input @change="selectBanner" type="file" class="hidden"/>
+                                    </label>
+                                </div>
+                                <div class="banner-logo-upload-box width-full">
+                                    <img :src="modalBannerUrl" alt="">
+                                    <label class="btn-pill">
+                                        <i class="fas fa-camera"></i>
+                                        <input @change="selectModalBanner" type="file" class="hidden"/>
+                                    </label>
+                                </div>
+                            </div>
                             <div class="col-md-12 col-sm-12 mb-4">
                                 <label>Tags</label>
                                 <multiselect 
@@ -164,7 +199,7 @@
 
     <!-- food Edit Modal -->
     <div class="modal fade" id="foodEditModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="foodEditModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title" style="flex: 1;">Update <span class="text-success">{{ fData.name }}</span>'s Info
@@ -201,6 +236,26 @@
 
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div class="form-group">
+                                            <label class="form-control-label">Restaurant</label>
+                                            <multiselect 
+                                                v-model="fData.restaurant" 
+                                                label="restaurant_name" 
+                                                track-by="restaurant_name" 
+                                                placeholder="Type to search" 
+                                                :options="restaurants" 
+                                                :searchable="true" 
+                                                :loading="isFetching" 
+                                                :options-limit="300" 
+                                                :limit="3" 
+                                                :max-height="600" 
+                                                :hide-selected="true" 
+                                                @search-change="fetchRestaurants"
+                                                @input="fetchCategories">
+                                            </multiselect>
+                                            <!-- if restaurant_id field is empty and try to submit show error message -->
+                                            <small class="text-danger">{{ errors.restaurant_id }}</small>
+                                        </div>
+                                        <div class="form-group">
                                             <label class="form-control-label">Category</label>
                                             <multiselect 
                                                 v-model="fData.category" 
@@ -218,6 +273,22 @@
                                             <small class="text-danger">{{ errors.category_id }}</small>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-12">
+                                <div class="banner-logo-upload-box width-full mb-4">
+                                    <img :src="bannerUrl" alt="">
+                                    <label class="btn-pill">
+                                        <i class="fas fa-camera"></i>
+                                        <input @change="selectBanner" type="file" class="hidden"/>
+                                    </label>
+                                </div>
+                                <div class="banner-logo-upload-box width-full">
+                                    <img :src="modalBannerUrl" alt="">
+                                    <label class="btn-pill">
+                                        <i class="fas fa-camera"></i>
+                                        <input @change="selectModalBanner" type="file" class="hidden"/>
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12 mb-4">
