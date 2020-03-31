@@ -53,8 +53,9 @@ $route['offer/change-status'] = 'offer/changestatus';
 // order routes
 $route['orders'] = 'order/index';
 $route['orders/all'] = 'order/allOrders';
-$route['order/change-status'] = 'order/changestatus';
+$route['orders/change-status/(:num)'] = 'order/changeStatus/$1';
 $route['orders/remove/(:num)'] = 'order/delete/$1';
+$route['orders/print/(:num)'] = 'order/printSingleOrder/$1';
 
 // Permission routes
 $route['settings/permissions'] = 'access/index';
@@ -163,3 +164,4 @@ $route['web/restaurant/(:any)'] = 'web/offersOfRestaurant';
 $route['stores/(:any)'] = 'web/allRestaurants';
 $route['web/category/(:any)'] = 'web/offersOfTag';
 $route['web/offers/search/(:any)'] = 'web/searchOfferByRestaurantAndTag';
+$route['web/restaurants'] = 'web/allRestaurants';

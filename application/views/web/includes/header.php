@@ -25,7 +25,7 @@
                 <nav class="primary-navigation clearfix fleft">
                     <ul class="st-menu wpc-menu">
                         <li><a href="#"><i class="unordered list icon"></i> Browse Coupons</a> </li>
-                        <li><a href="<?php echo base_url(); ?>web/allRestaurants">Stores</a> </li>
+                        <li><a href="<?php echo base_url(); ?>web/restaurants">Stores</a> </li>
                     </ul>
                 </nav> <!-- END .primary-navigation -->
             </div> <!-- END .container -->

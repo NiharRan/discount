@@ -30,6 +30,7 @@ new Vue({
       this.fetchOrders();
       // clean error object
       this.errors = {};
+      this.order = {};
       // close modal
       $(modalName).modal("hide");
     },
@@ -46,6 +47,39 @@ new Vue({
     },
     sum(food_price, aditional_price) {
       return parseFloat(parseFloat(food_price) + parseFloat(aditional_price)).toFixed(2);
+    },
+    edit(order) {
+      this.order = order;
+      this.openModal('#orderEditModal');
+    },
+    async confirmAction(statusPresentType, statusPastType) {
+      $('#orderEditModal').modal('hide');
+      var result = await Swal.fire({
+        title: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, "+statusPresentType+" it!"
+      })
+      if (result.value) {
+        var formData = new FormData();
+        var id = this.order.order_id;
+        var customer_id = this.order.customer_id;
+        formData.append('order_status', this.order_status);
+        formData.append('customer_id', customer_id);
+        var {data} = await axios.post(base_url + "orders/change-status/" + id, formData)
+        if (data.success) {
+          this.fetchOrders();
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: `Order ${statusPastType} successfully`,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      }
     },
     preview(order) {
       // open order edit modal
@@ -80,7 +114,7 @@ new Vue({
     },
     async authPermissions() {
       var response = await axios.get(base_url+'auth/permissions');
-      if (response.status === 200) {
+      if (response.status == 200) {
         this.userPermissions = response.data.data;
       }
     },
@@ -93,7 +127,7 @@ new Vue({
        */
       var status = false;
       var data = await this.userPermissions.find((permission) => {
-        return permission.action === action && permission.model_name === model_name;
+        return permission.action == action && permission.model_name == model_name;
       });
       // if status updated
       if (data !== null) {
@@ -130,31 +164,9 @@ new Vue({
         this.links = data.links
       }
     },
-    async changeStatus(order) {
-      /**
-       * this method change order's status
-       * @param order_status
-       * @response success
-       */
-      var formData = new FormData();
-      var statusMsg = order.order_status == 1 ? "Inactive" : "Active";
-      formData.append('order_status', order.order_status);
-      formData.append('order_id', order.order_id);
-
-      // send request to server
-      var {data} = await axios.post(base_url+'orders/change-status', formData);
-      // if status updated
-      if (data.success) {
-        this.fetchOrders();
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "order now "+ statusMsg,
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }
-    },
+    closeEditModal() {
+      this.cleanForm('#orderEditModal');
+    }
   },
   created() {
     // after page is created call those method
@@ -189,7 +201,7 @@ new Vue({
   },
   filters: {
     customDate(value) {
-      return moment(value).format("DD-MM-YYYY");
+      return moment(value).format("DD/MM/YYYY hh:mm A");
     },
     orderStatusText(value) {
         return value == 1 ? 'Free' : value == 2 ? 'Assigned' : 'Inactive';

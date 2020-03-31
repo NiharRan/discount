@@ -94,9 +94,19 @@ class Order_Model extends CI_Model
             foreach ($food_prices as $ke => $food_price) {
                 $food_prices[$ke]['food'] = $this->global_model->has_one('foods', 'food_id', $food_price['food_id']);
                 $food_prices[$ke]['food_size'] = $this->global_model->has_one('food_sizes', 'food_size_id', $food_price['food_size_id']);
+                $order_food = $this->db->select('*')
+                    ->from('order_foods')
+                    ->where(array(
+                        'order_id' => $order['order_id'],
+                        'food_price_id' => $food_price['food_price_id']
+                    ))
+                    ->get()
+                    ->row_array();
+                $food_prices[$ke]['aditional_price'] = $order_food['food_aditional_price'];
+
                 $food_prices[$ke]['food_aditionals'] = $this->db->select('*')
                     ->from('food_aditionals')
-                    ->where_in('food_aditional_id', $food_price['food_aditional_id'])
+                    ->where_in('food_aditional_id', explode(',', $order_food['food_aditional_id']))
                     ->get()
                     ->result_array();
             }

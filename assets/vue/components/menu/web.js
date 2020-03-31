@@ -111,7 +111,7 @@ new Vue({
         orederItemData.append('food_id', this.orderList[i].food_id);
         orederItemData.append('food_price_id', this.orderList[i].food_price_id);
         orederItemData.append('food_aditional_id', aditional_ids.toString());
-        orederItemData.append('food_aditinal_price', this.orderList[i].food_aditional_price);
+        orederItemData.append('food_aditional_price', this.orderList[i].food_aditional_price);
 
         var response = await axios.post(base_url+'order-item', orederItemData);
         if (response.status !== 200) status = false;

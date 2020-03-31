@@ -22,7 +22,7 @@
                         <?php
                         if (count($total) > 0) {
                             foreach ($total as $key => $value) { ?>
-                            <a href="<?php echo base_url(); ?>web/allRestaurants/?key=<?php echo $key; ?>" class="item"><div class="ui mini label"><?php echo $value; ?></div><?php echo $key; ?></a>
+                            <a href="<?php echo base_url(); ?>web/restaurants?key=<?php echo $key; ?>" class="item"><div class="ui mini label"><?php echo $value; ?></div><?php echo $key; ?></a>
                         <?php }
                         }
                         ?>

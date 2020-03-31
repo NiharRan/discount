@@ -62,6 +62,7 @@ class Order extends CI_Controller {
 		echo json_encode($jsonData);
 	}
 
+
 	/**
 	 * fetch all orders by this method. 
 	 * Return order list if table is not empty
@@ -110,29 +111,50 @@ class Order extends CI_Controller {
 	}
 
 	/**
-	 * order status change by this method. 
-	 * if status change
-	 * Return success true 
-	 * otherwise false.
+	 * order action by this method. 
+	 * Return TRUE if action done successfully
+	 * otherwise FALSE.
 	 *
-	 * @return	true/false
+	 * @param order_id
+	 * @return	bool
 	 */
-	function changeStatus()
+	function changeStatus($order_id)
 	{
 		// initialize response data
 		$jsonData = array('success' => false);
 		$order_status = $this->input->post('order_status');
-		$order_id = $this->input->post('order_id');
+		$customer_id = $this->input->post('customer_id');
 		// change status through this method
-		$result = $this->db->set('order_status', $order_status == 1 ? 0 : 1)
+		$result = $this->db->set('order_status', $order_status)
 						->where('order_id', $order_id)
 						->update("orders");
 		// if status changed 
 		if ($result) {
 			$jsonData['success'] = true;
+			// $this->send_email($order_id, $customer_id);
 		}
 		// send response to client
 		echo json_encode($jsonData);
+	}
+
+	function send_email($order_id, $customer_id)
+	{
+		$customer = $this->global_model->has_one('customers', 'customer_id', $customer_id);
+		$data['customer'] = $customer;
+		$this->load->library('email');
+		$this->email->from($this->config->item('webmaster_email', 'tank_auth'), $this->config->item('website_name', 'tank_auth'));
+		$this->email->reply_to($this->config->item('webmaster_email', 'tank_auth'), $this->config->item('website_name', 'tank_auth'));
+		$this->email->to($customer['customer_email']);
+		$this->email->subject(sprintf($this->lang->line('Confirmation Message'), $this->config->item('website_name', 'tank_auth')));
+		$this->email->message($this->load->view('email/confirm_message', $data, TRUE));
+		$this->email->send();
+	}
+
+	function printSingleOrder($order_id)
+	{
+		$query['order_id'] = $order_id;
+		$data['order'] = $this->order_model->fetch_order_on_condition($query)[0];
+		$this->load->view('admin/order/print', $data);
 	}
     
 }
