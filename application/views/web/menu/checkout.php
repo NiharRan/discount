@@ -149,9 +149,9 @@
                                         <span class="name"><a href="#productModal" data-toggle="modal">{{ order.food_name }}</a></span>
                                         <span class="caption text-muted">{{ order.food_size_name}} ({{ order.food_weight }}g)</span>
                                     </td>
-                                    <td class="price">${{ order.food_price }}</td>
+                                    <td class="price">${{ parseFloat(parseFloat(order.food_price) + parseFloat(order.food_aditional_price)).toFixed(2) }}</td>
                                     <td class="actions">
-                                        <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
+                                        <a href="#" @click="showFoodInfoForEdit(order, key)" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
                                         <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
                                     </td>
                                 </tr>
@@ -261,7 +261,7 @@
                         </td>
                         <td class="price">${{ order.food_price }}</td>
                         <td class="actions">
-                            <a href="#productModal" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
+                            <a href="#" @click="showFoodInfoForEdit(order, key)" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
                             <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
                         </td>
                     </tr>
@@ -346,7 +346,101 @@
     <!-- Footer / End -->
     </div>
 <!-- Content / End -->
-
+<div class="modal fade" id="productModal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-lg dark bg-dark">
+                <div class="bg-image"><img src="<?php echo base_url(); ?>assets/menu/img/photos/modal-add.jpg" alt=""></div>
+                <h4 class="modal-title">Specify your dish</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="ti-close"></i></button>
+            </div>
+            <div class="modal-product-details">
+                <div class="row align-items-center">
+                    <div class="col-9">
+                        <h6 class="mb-0">{{ formData.food_name }}</h6>
+                        <input type="hidden" v-model="formData.tag_ids">
+                        <span class="text-muted">{{ formData.tag_names }}</span>
+                    </div>
+                    <div class="col-3 text-lg text-right">${{ formData.food_lowest_price }}</div>
+                </div>
+            </div>
+            <div class="modal-body panel-details-container">
+                <!-- Panel Details / Size -->
+                <div class="panel-details">
+                    <h5 class="panel-details-title">
+                        <label class="custom-control custom-radio">
+                            <input name="radio_title_size" type="radio" class="custom-control-input">
+                            <span class="custom-control-indicator"></span>
+                        </label>
+                        <a href="#panelDetailsSize" data-toggle="collapse">Size</a>
+                    </h5>
+                    <div id="panelDetailsSize" class="collapse show">
+                        <div class="panel-details-content">
+                            <div 
+                                v-if="formData.food_prices.length > 0"
+                                v-for="(food_price, fp_key) in formData.food_prices" 
+                                :key="fp_key"
+                                class="form-check">
+                                <label>
+                                    <input v-model="formData.food_price_id"
+                                        :value="food_price.food_price_id" 
+                                        type="radio">
+                                    <span class="label-text">{{ food_price.food_size.food_size_name }} - {{ food_price.food_weight }}g (${{ food_price.food_price }})</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Panel Details / Additions -->
+                <div class="panel-details">
+                    <h5 class="panel-details-title">
+                        <label class="custom-control custom-radio">
+                            <input name="radio_title_additions" type="radio" class="custom-control-input">
+                            <span class="custom-control-indicator"></span>
+                        </label>
+                        <a href="#panelDetailsAdditions" data-toggle="collapse">Additions</a>
+                    </h5>
+                    <div id="panelDetailsAdditions" class="collapse">
+                        <div class="panel-details-content">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div 
+                                        v-if="aditionals.length > 0"
+                                        v-for="(aditional, a_key) in aditionals" 
+                                        :key="a_key"
+                                        class="form-check">
+                                        <label>
+                                            <input 
+                                                type="checkbox" 
+                                                class="food-aditional-id"
+                                                v-model="formData.food_aditional_ids"
+                                                :value="aditional.food_aditional_id">
+                                            <span class="label-text">{{ aditional.food_aditional_name }}(${{ aditional.food_aditional_price }})</span>
+                                        </label>
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Panel Details / Other -->
+                <div class="panel-details">
+                    <h5 class="panel-details-title">
+                        <label class="custom-control custom-radio">
+                            <input name="radio_title_other" type="radio" class="custom-control-input">
+                            <span class="custom-control-indicator"></span>
+                        </label>
+                        <a href="#panelDetailsOther" data-toggle="collapse">Other</a>
+                    </h5>
+                    <div id="panelDetailsOther" class="collapse">
+                        <textarea v-model="formData.order_description" cols="30" rows="4" class="form-control" placeholder="Put this any other informations..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <button type="button" @click="addToCart" class="add-cart modal-btn btn btn-secondary btn-block btn-lg"><span>Add to Cart</span></button>
+        </div>
+    </div>
+</div>
 <!-- Panel Mobile -->
 <nav id="panel-mobile">
 <div class="module module-logo bg-dark dark">

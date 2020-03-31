@@ -31,7 +31,9 @@ new Vue({
     errors: {
         food_size_name: ""
     },
+    key: -1,
     isLoading: false,
+    isEditing: false
   },
 
   methods: {
@@ -87,16 +89,16 @@ new Vue({
     },
     async storeOrderInfo(customer_id) {
       var orderData = new FormData();
-            orderData.append('customer_id', customer_id);
-            orderData.append('total_price', this.totalPrice);
-            orderData.append('order_description', this.formData.order_description);
-            orderData.append('order_priority', this.formData.order_priority);
-            orderData.append('payment_type', this.formData.payment_type);
-            orderData.append('restaurant_id', this.restaurant.restaurant_id);
-            var response = await axios.post(base_url+'order/create', orderData);
-            if (response.status === 200) {
-              this.storeOrderItemInfo(response.data.id);
-            }
+      orderData.append('customer_id', customer_id);
+      orderData.append('total_price', this.totalPrice);
+      orderData.append('order_description', this.formData.order_description);
+      orderData.append('order_priority', this.formData.order_priority);
+      orderData.append('payment_type', this.formData.payment_type);
+      orderData.append('restaurant_id', this.restaurant.restaurant_id);
+      var response = await axios.post(base_url+'order/create', orderData);
+      if (response.status === 200) {
+        this.storeOrderItemInfo(response.data.id);
+      }
     },
     async storeOrderItemInfo(order_id) {
       var status = true;
@@ -157,9 +159,13 @@ new Vue({
         order_description: this.formData.order_description,
         food_aditional_ids: JSON.stringify(food_aditional_ids),
       };
-      orderList.push(newOrder);
-      this.productCount++;
-      this.totalPrice = parseFloat(parseFloat(this.totalPrice) + totalAditionalPrice + parseFloat(newOrder.food_price)).toFixed(2);
+      if (this.isEditing) {
+        orderList[this.key] = newOrder;
+      } else {
+        orderList.push(newOrder);
+        this.productCount++;
+        this.totalPrice = parseFloat(parseFloat(this.totalPrice) + totalAditionalPrice + parseFloat(newOrder.food_price)).toFixed(2);
+      }
       localStorage.setItem('orderList', JSON.stringify(orderList));
       $('#productModal').modal('hide');
 
@@ -168,6 +174,7 @@ new Vue({
       this.food_aditional_ids = [];
       this.formData.order_description = '';
       $('.food-aditional-id').removeAttr('checked');
+      this.calculateOrderPrice();
     },
     removeFromCart(key) {
       var orderList = this.orderList;
@@ -193,11 +200,16 @@ new Vue({
         this.showPanelCart();
       }
     },
-    async showFoodInfoForEdit(food) {
-      var response = await axios.get(base_url+'menu/foods/'+food.food_id);
+    async showFoodInfoForEdit(order, key) {
+      var response = await axios.get(base_url+'menu/foods/'+order.food_id);
       if (response.status === 200) {
         var food = response.data;
         this.showFoodInfo(food);
+        this.formData.food_price_id = order.food_price_id;
+        this.formData.food_aditional_ids = JSON.parse(order.food_aditional_ids);
+        this.formData.order_description = order.order_description;
+        this.isEditing = true;
+        this.key = key;
       }
     },
     async showFoodInfo(food) {

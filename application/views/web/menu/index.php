@@ -366,9 +366,9 @@
                             <span class="name"><a href="#productModal" data-toggle="modal">{{ order.food_name }}</a></span>
                             <span class="caption text-muted">{{ order.food_size_name}} ({{ order.food_weight }}g)</span>
                         </td>
-                        <td class="price">${{ order.food_price }}</td>
+                        <td class="price">${{ parseFloat(parseFloat(order.food_price) + parseFloat(order.food_aditional_price)).toFixed(2) }}</td>
                         <td class="actions">
-                            <a href="#" @click="showFoodInfoForEdit(order)" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
+                            <a href="#" @click="showFoodInfoForEdit(order, key)" data-toggle="modal" class="action-icon"><i class="ti ti-pencil"></i></a>
                             <a href="#" class="action-icon" @click="removeFromCart(key)"><i class="ti ti-close"></i></a>
                         </td>
                     </tr>
