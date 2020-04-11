@@ -131,7 +131,7 @@ class Offer_Model extends CI_Model
             $query[$key]['user'] = $this->global_model->with('users', 'id', $offer['offer_creator']);
             $query[$key]['template'] = $this->global_model->with('templates', 'template_id', $offer['template_id']);
         }
-        return count($query) == 1 ? $query[0] : $query;
+        return $query;
     }
 
 

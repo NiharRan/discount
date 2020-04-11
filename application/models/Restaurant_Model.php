@@ -225,7 +225,7 @@ class Restaurant_Model extends CI_Model
 			$user = $this->global_model->with('users', 'id', $restaurant['restaurant_creator']);
 			$query[$key]['creator'] = $user;
         }
-        return count($query) == 1 ? $query[0] : $query;
+        return $query;
     }
 
 	/**

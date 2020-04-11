@@ -102,7 +102,7 @@ class Web extends CI_Controller {
 	function offersOfRestaurant()
 	{
 		$query['restaurant_slug'] = $this->uri->segment(3);
-		$data['restaurant'] = $this->restaurant_model->fetch_restaurant_on_condition($query);
+		$data['restaurant'] = $this->restaurant_model->fetch_restaurant_on_condition($query)[0];
 
 		$data['popularTags'] = $this->db->select('*')
 								->from('tags')->where('tag_status', 1)
@@ -178,7 +178,7 @@ class Web extends CI_Controller {
 		$this->db->where('offer_slug', $query['offer_slug'])
 				->set('visit_count', 'visit_count + 1', false)
 				->update('offers');
-		$data['offer'] = $this->offer_model->fetch_offer_on_condition($query);
+		$data['offer'] = $this->offer_model->fetch_offer_on_condition($query)[0];
 
 		$data['title'] = 'Offer.com || '.$data['offer']['offer_name'];
         $data['user_id']	= $this->tank_auth->get_user_id();
