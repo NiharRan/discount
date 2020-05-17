@@ -31,6 +31,7 @@ $route['settings/roles/change-status'] = 'role/changestatus';
 // restaurant routes
 $route['restaurants'] = 'restaurant/index';
 $route['restaurants/all'] = 'restaurant/allrestaurants';
+$route['restaurants/all/active'] = 'restaurant/allrestaurants';
 $route['restaurants/search'] = 'restaurant/searchRestaurantsForCategory';
 $route['restaurants/create'] = 'restaurant/create';
 $route['restaurants/(:any)'] = 'restaurant/edit';

@@ -13,10 +13,30 @@
                         <div class="row">
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <input type="text" v-model="formData.offer_name" placeholder="Offer Name" class="form-control">
                                         <!-- if offer_name field is empty and try to submit show error message -->
                                         <small class="text-danger">{{ errors.offer_name }}</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <multiselect 
+                                            v-model="formData.restaurant_id" 
+                                            :height="300"
+                                            :options="restaurants" 
+                                            :multiple="false" 
+                                            :close-on-select="true" 
+                                            :clear-on-select="true" 
+                                            :preserve-search="true" 
+                                            placeholder="Select Restaurant"
+                                            label="restaurant_name" 
+                                            track-by="restaurant_name" 
+                                            :preselect-first="false"
+                                        >
+                                        </multiselect>
+                                        <!-- if template_id field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.restaurant_id }}</small>
                                     </div>
                                     <div class="col-md-6">
                                         <multiselect 
@@ -37,12 +57,21 @@
                                         <small class="text-danger">{{ errors.template_id }}</small>
                                     </div>
                                 </div>
-
                                 <div class="form-group row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8 col-sm-12">
                                         <textarea v-model="formData.offer_description" class="tinymce"></textarea>
                                         <!-- if offer_description field is empty and try to submit show error message -->
                                         <small class="text-danger">{{ errors.offer_description }}</small>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <div class="banner-logo-upload-box width-full">
+                                            <img :src="imageUrl" alt="">
+                                            <label class="btn-pill">
+                                                <i class="fas fa-camera"></i>
+                                                <input @change="selectImage" type="file" class="hidden"/>
+                                            </label>
+                                        </div>
+                                        <small class="text-danger">{{ errors.offer_image }}</small>
                                     </div>
                                 </div>
 

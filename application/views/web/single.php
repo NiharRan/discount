@@ -33,12 +33,10 @@
          * first check offers exists or not
          */
         if (count($offer) > 0) {
-            // create restaurant logo url
-            $restaurantLogo = $offer['restaurant']['restaurant_logo'];
-            $onlyName = substr($restaurantLogo, 0, strpos($restaurantLogo, '.'));
-            $ext = substr($restaurantLogo, strpos($restaurantLogo, '.'), strlen($restaurantLogo) - 1);
-            $path = base_url().'uploads/restaurant/restaurant-'.$offer['restaurant']['restaurant_id'];
-            $restaurantLogoURL = $path.'/'.$onlyName.$ext;
+            // create offer image url
+            $offerImage = $offer['offer_image'];
+            $offerImageURL = base_url().'uploads/offer/offer-'.$offer['offer_id'].'/'.$offerImage;
+            
 
             // offer description
             $description = $offer['offer_description'];
@@ -69,8 +67,8 @@
                     </div>
                 </div>
                 <div class="post-image">
-                    <a href="<?php echo $offerURL; ?>">
-                        <img src="<?php echo $restaurantLogoURL; ?>" alt="">
+                    <a class="clearfix" style="text-align: center;" href="<?php echo $offerURL; ?>">
+                        <img src="<?php echo $offerImageURL; ?>" alt="">
                     </a>
                 </div>
                 <div class="post-body">

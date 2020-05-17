@@ -24,7 +24,7 @@ class Web extends CI_Controller {
 		// feature restaurants
 		$data['restaurants'] = $this->db->select('*')
 								->from('restaurants')->where('restaurant_status', 1)
-								->limit(10)->get()->result_array();
+								->limit(12)->get()->result_array();
 
 		// most viewed tags
 		$data['tags'] = $this->db->select('*')
@@ -134,6 +134,7 @@ class Web extends CI_Controller {
 		// fetch 10 offer from server
 		$perpage = $query['perpage'];
 		$base_url = $query['base_url'];
+		$query['from'] = 'web';
 
 		// response object
 		$data = array('data' => array(), 'links' => '');

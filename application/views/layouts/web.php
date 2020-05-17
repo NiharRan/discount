@@ -37,6 +37,28 @@
 
     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/web/ST-User/css/style.css">
 
+    <style>
+        .clearfix::after,
+        .clearfix::before {
+            display: block;
+            content: "";
+            clear: both;
+        }
+        .col {
+            margin: 0px -15px;
+        }
+        .col-md-3 {
+            width: 25%;
+            float: left;
+            padding: 15px;
+        }
+        @media screen and (max-width: 500px) {
+            .col-sm-12 {
+                width: 100%;
+            }
+        }
+    </style>
+
 </head>
 <body>
 <div id="page" class="hfeed site">

@@ -9,7 +9,7 @@
                         <h3 class="mb-0"><i class="fas fa-store"></i> Offer Lists</h3>
                     </div>
                     <div class="form-group">
-                        <input type="text" @keyup="fetchoffers" v-model="search" class="form-control" placeholder="Search">
+                        <input type="text" @keyup="fetchOffers" v-model="search" class="form-control" placeholder="Search">
                     </div>
                     <div class="form-group mx-sm-3">
                         <!-- if logged in user has permission to create new offer -->
@@ -37,7 +37,17 @@
                     <tbody>
                         <tr v-for="(offer, key) in offers" :key="key">
                             <th scope="row">
-                                {{ offer.offer_name }}
+                                <div class="media align-items-center">
+                                    <a href="#" class="avatar-md mr-3">
+                                        <img 
+                                        alt="Image placeholder" 
+                                        style="width: 100%;"
+                                        :src=" (offer.offer_image.length > 0) ? 'uploads/offer/offer-'+offer.offer_id+'/'+offer.offer_image_thumb : 'uploads/default/offer/default-logo.png'">
+                                    </a>
+                                    <div class="media-body">
+                                        <h2 class="mb-0 text-m">{{ offer.offer_name }}</h2>
+                                    </div>
+                                </div>
                             </th>
                             <td>
                                 {{ offer.restaurant.restaurant_name }}
@@ -92,9 +102,113 @@
             <div class="modal fade" id="previewModal" data-keyboard="false" data-backdrop="false" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content">
-                        <div class="modal-body">
+                        <div class="modal-header">
+                            <h3 class="modal-title" style="flex: 1;">Edit <strong class="text-primary">{{ formData.offer_name}}'s</strong> info <span class="text-success">{{ formData.restaurant_name }}</span>
+                                <button type="button" class="close float-right" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </h3>
                             
                         </div>
+                        <div class="modal-body pt-0" style="min-height: 400px;">
+                            <div class="lds-ripple" v-if="isloading">
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <form @submit.prevent="update" v-if="!isloading">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <input type="text" v-model="formData.offer_name" placeholder="Offer Name" class="form-control">
+                                        <!-- if offer_name field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.offer_name }}</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <multiselect 
+                                            v-model="formData.restaurant" 
+                                            :height="300"
+                                            :options="restaurants" 
+                                            :multiple="false" 
+                                            :close-on-select="true" 
+                                            :clear-on-select="true" 
+                                            :preserve-search="true" 
+                                            placeholder="Select Restaurant"
+                                            label="restaurant_name" 
+                                            track-by="restaurant_name" 
+                                            :preselect-first="false"
+                                        >
+                                        </multiselect>
+                                        <!-- if template_id field is empty and try to submit show error message -->
+                                        <small class="text-danger">{offer }}</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <multiselect 
+                                            v-model="formData.template" 
+                                            :height="300"
+                                            :options="templates" 
+                                            :multiple="false" 
+                                            :close-on-select="true" 
+                                            :clear-on-select="true" 
+                                            :preserve-search="true" 
+                                            placeholder="Select Template"
+                                            label="template_name" 
+                                            track-by="template_name" 
+                                            :preselect-first="false"
+                                        >
+                                        </multiselect>
+                                        <!-- if template_id field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.template_id }}</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-8 col-sm-12">
+                                    <ckeditor :editor="editor" v-model="formData.offer_description" :config="editorConfig"></ckeditor>
+                                        <!-- if offer_description field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.offer_description }}</small>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <div class="banner-logo-upload-box width-full">
+                                            <img id="logo" :src="imageUrl" alt="">
+                                            <label class="btn-pill">
+                                                <i class="fas fa-camera"></i>
+                                                <input @change="selectImage" type="file" class="hidden"/>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-4">
+                                        <input type="text" v-model="formData.offer_discount" placeholder="Offer Discount" class="form-control">
+                                        <!-- if offer_discount field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.offer_discount }}</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <datetime 
+                                            v-model="formData.offer_start" 
+                                            placeholder="Offer Start At"
+                                            auto>
+                                        </datetime>
+                                        <!-- if offer_start field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.offer_start }}</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <datetime 
+                                            v-model="formData.offer_end" 
+                                            placeholder="Offer End At"
+                                            auto>
+                                        </datetime>
+                                        <!-- if offer_end field is empty and try to submit show error message -->
+                                        <small class="text-danger">{{ errors.offer_end }}</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-12 col-sm-12 text-center">
+                                        <button type="submit" class="btn btn-success btn-sm">Update</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

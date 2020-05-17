@@ -35,15 +35,15 @@
                         <tr v-for="(restaurant, key) in restaurants" :key="key">
                             <th scope="row">
                                 <div class="media align-items-center">
-                                <a href="#" class="avatar-md mr-3">
-                                    <img 
-                                    alt="Image placeholder" 
-                                    style="width: 100%;"
-                                    :src=" (restaurant.restaurant_logo.length > 0) ? 'uploads/restaurant/restaurant-'+restaurant.restaurant_id+'/'+restaurant.restaurant_logo : 'uploads/default/restaurant/default-logo.png'">
-                                </a>
-                                <div class="media-body">
-                                    <h2 class="mb-0 text-m">{{ restaurant.restaurant_name }}</h2>
-                                </div>
+                                    <a href="#" class="avatar-md mr-3">
+                                        <img 
+                                        alt="Image placeholder" 
+                                        style="width: 100%;"
+                                        :src=" (restaurant.restaurant_logo.length > 0) ? 'uploads/restaurant/restaurant-'+restaurant.restaurant_id+'/'+restaurant.restaurant_logo_thumb : 'uploads/default/restaurant/default-logo.png'">
+                                    </a>
+                                    <div class="media-body">
+                                        <h2 class="mb-0 text-m">{{ restaurant.restaurant_name }}</h2>
+                                    </div>
                                 </div>
                             </th>
                             <td>

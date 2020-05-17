@@ -84,6 +84,8 @@ class Offer_Model extends CI_Model
         // if client search something
         if(!empty($search)) $this->db->like('offer_name', $search);
         if(!empty($restaurant_ids)) $this->db->where_in('restaurant_id', $restaurant_ids);
+        $crntDate = date("Y-m-d");
+        if(isset($query['from']) && $query['from'] == 'web') $this->db->where("offer_start <= '$crntDate' && offer_end >= '$crntDate'"); 
         $query = $this->db->limit($limit, $start)->get()->result_array();
 
         // with restaurant, user, template info

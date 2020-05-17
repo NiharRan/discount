@@ -39,6 +39,11 @@ class Offer extends CI_Controller {
 			// view page data
 			$data['extrastyle'] = 'inc/_vuestyle';
 			$data['extrascript'] = 'inc/_vuescript';
+
+			// editor cdn src
+			$data['editor'] = 'plugins/ckeditor5/ckeditor'; 
+			$data['editorVue'] = 'plugins/ckeditor5/ckeditor.min'; 
+
 			$data['vuecomponent'] = 'components/offer/list';
 			$data['content'] = 'admin/offer/list';
 			$this->load->view('layouts/master', $data);
@@ -97,34 +102,79 @@ class Offer extends CI_Controller {
 			array('field' => 'offer_end', 'label' => 'Offer end date', 'rules' => 'required'),
 			array('field' => 'template_id', 'label' => 'Template', 'rules' => 'required'),
 		);
+		
 		// set rules for validation
 		$this->form_validation->set_rules($rules);
 		// if validation is done & everything is valid
 		if ($this->form_validation->run()) {
-			$jsonData['check'] = true;
-			// store offer info
-			$offer_name = $this->input->post('offer_name');
-			$restaurant_name = $this->input->post('restaurant_name');
-			$data = array(
-				'offer_name' => $offer_name,
-				'offer_slug' => url_title($this->input->post('offer_name'), "dash", true),
-				'offer_description' => $this->input->post('offer_description'),
-				'offer_discount' => $this->input->post('offer_discount'),
-				'offer_start' => date('Y-m-d', strtotime($this->input->post('offer_start'))),
-				'offer_end' => date("Y-m-d", strtotime($this->input->post('offer_end'))),
-				'template_id' => $this->input->post('template_id'),
-				'restaurant_id' => $this->input->post('restaurant_id'),
-				'offer_barcode' => $this->create_barcode($offer_name, $restaurant_name),
-				'offer_status' => 1,
-				'offer_created_at' => date('Y-m-d H:i:s'),
-				'offer_creator' => $this->user_id
-			);
-			// store offer through offer model
-			$id = $this->offer_model->store($data);
+			// check offer image is required
+			if (isset($_FILES['offer_image']) && $_FILES['offer_image']['name'] != '') {
+				$jsonData['check'] = true;
+				// store offer info
+				$offer_name = $this->input->post('offer_name');
+				$restaurant_name = $this->input->post('restaurant_name');
+				$data = array(
+					'offer_name' => $offer_name,
+					'offer_slug' => url_title($this->input->post('offer_name'), "dash", true),
+					'offer_description' => $this->input->post('offer_description'),
+					'offer_discount' => $this->input->post('offer_discount'),
+					'offer_start' => date('Y-m-d', strtotime($this->input->post('offer_start'))),
+					'offer_end' => date("Y-m-d", strtotime($this->input->post('offer_end'))),
+					'template_id' => $this->input->post('template_id'),
+					'restaurant_id' => $this->input->post('restaurant_id'),
+					'offer_barcode' => $this->create_barcode($offer_name, $restaurant_name),
+					'offer_status' => 1,
+					'offer_created_at' => date('Y-m-d H:i:s'),
+					'offer_creator' => $this->user_id
+				);
+				// store offer through offer model
+				$offer_id = $this->offer_model->store($data);
 
-			if ($id) {
-				$jsonData['success'] = true;
+				if ($offer_id) {
+					// if offer image is provided
+					if(isset($_FILES['offer_image']['name']) && $_FILES['offer_image']['name'] != ''){
+						$folder = 'offer-'.$offer_id;
+						$ext = pathinfo($_FILES['offer_image']['name'], PATHINFO_EXTENSION);
+						$time = time();
+						$file_name = 'image-'.$time.'.'.$ext;
+						$thumb_file_name = 'image-'.$time.'_thumb.'.$ext;
+
+						$_FILES['offer_image']['name']=$file_name;
+						$path = './uploads/offer/'.$folder;
+
+						// if directory not exists, create
+						if (!is_dir($path)) {
+							mkdir($path, 0777, true);
+						}
+						$config['upload_path'] 		= $path;
+						$config['allowed_types'] 	='*';
+						
+						// load upload library
+						$this->load->library('upload', $config);
+						// check image uploaded or not
+						if($this->upload->do_upload('offer_image')){
+							$uploadData = $this->upload->data();
+							// resize image
+							$query['path'] = $uploadData['full_path'];
+							$query['width'] = 1000;
+							$query['height'] = 600;
+							$this->resizeImage($query);
+
+							// update offer info
+							$imageData = array(
+								'offer_image' => $file_name,
+								'offer_image_thumb' => $thumb_file_name,
+							);
+							$this->db->where('offer_id',$offer_id);
+							$this->db->update('offers',$imageData);
+							$jsonData['success'] = true;
+						}
+					}
+				}
+			} else {
+				$jsonData['errors']['offer_image'] = 'Offer image is required';
 			}
+			
 		} else {
 			foreach ($_POST as $key => $value) {
 				$jsonData['errors'][$key] = strip_tags(form_error($key));
@@ -134,6 +184,27 @@ class Offer extends CI_Controller {
 		// send the response to client
 		echo json_encode($jsonData);
 	}
+
+	/**
+	 * this method resize image 
+	 * @param array [path, width, height]
+	 * @return boolean
+	 */
+	function resizeImage($data)
+	{
+		$cropConfig['image_library'] = 'gd2';
+		$cropConfig['source_image'] = $data['path'];
+		$cropConfig['create_thumb'] = TRUE;
+		$cropConfig['maintain_ratio'] = TRUE;
+		$cropConfig['width']         = $data['width'];
+		$cropConfig['height']       = $data['height'];
+
+		$this->load->library('image_lib');
+		$this->image_lib->clear();
+		$this->image_lib->initialize($cropConfig);
+		$this->image_lib->resize();
+	}
+	
 
 	/**
 	 * offer update by this method. 
@@ -154,32 +225,90 @@ class Offer extends CI_Controller {
 			array('field' => 'offer_start', 'label' => 'Offer start date', 'rules' => 'required'),
 			array('field' => 'offer_end', 'label' => 'Offer end date', 'rules' => 'required'),
 			array('field' => 'template_id', 'label' => 'Template', 'rules' => 'required'),
+			array('field' => 'restaurant_id', 'label' => 'Restaurant', 'rules' => 'required'),
 		);
 		// set rules for validation
 		$this->form_validation->set_rules($rules);
 		// if validation is done & everything is valid
 		if ($this->form_validation->run()) {
+			$jsonData['check'] = true;
 			// update offer info
 			$offer_id = $this->input->post('offer_id');
 			$offer_name = $this->input->post('offer_name');
-			$restaurant_name = $this->input->post('restaurant_name');
+			$offer_image = $this->input->post('offer_image');
 			$data = array(
 				'offer_name'        => $offer_name,
-				'offer_slug' => url_title($this->input->post('offer_name'), "dash", true),
+				'offer_slug'        => url_title($this->input->post('offer_name'), "dash", true),
 				'offer_description' => $this->input->post('offer_description'),
 				'offer_discount'    => $this->input->post('offer_discount'),
 				'offer_start'       => date('Y-m-d', strtotime($this->input->post('offer_start'))),
 				'offer_end'         => date("Y-m-d", strtotime($this->input->post('offer_end'))),
 				'template_id'       => $this->input->post('template_id'),
 				'restaurant_id'     => $this->input->post('restaurant_id'),
-				'offer_barcode'     => $this->create_barcode($offer_name, $restaurant_name),
-				'offer_creator'     => $this->user_id
 			);
 			// update offer through offer model
-			$id = $this->offer_model->update($data);
+			$result = $this->offer_model->update($data, $offer_id);
 
-			if ($id) {
-				$jsonData['success'] = true;
+			if ($result) {
+				// if offer image is provided
+				if(isset($_FILES['offer_new_image']['name']) && $_FILES['offer_new_image']['name'] != ''){
+					$folder = 'offer-'.$offer_id;
+					$ext = pathinfo($_FILES['offer_new_image']['name'], PATHINFO_EXTENSION);
+					$time = time();
+					$file_name = 'image-'.$time.'.'.$ext;
+					$thumb_file_name = 'image-'.$time.'_thumb.'.$ext;
+
+					$_FILES['offer_new_image']['name']=$file_name;
+					$path = './uploads/offer/'.$folder;
+
+					// old image path
+					$oldImage = $path.'/'.$offer_image;
+					$onlyName = substr($offer_image, 0, strpos($offer_image, '.'));
+					$oldImageThumb = $path.'/'.$onlyName.'_thumb.'.$ext;
+					/**
+					 * check if old image is exists
+					 * then delete first
+					 */
+					if (file_exists($oldImage)) {
+						// give permission to delete
+						chmod($oldImage, 0777);
+						unlink($oldImage);
+					}
+					if (file_exists($oldImageThumb)) {
+						// give permission to delete
+						chmod($oldImageThumb, 0777);
+						unlink($oldImageThumb);
+					}
+
+					// if directory not exists, create
+					if (!is_dir($path)) {
+						mkdir($path, 0777, true);
+					}
+					$config['upload_path'] 		= $path;
+					$config['allowed_types'] 	='*';
+					
+					// load upload library
+					$this->load->library('upload', $config);
+					// check image uploaded or not
+					if($this->upload->do_upload('offer_new_image')){
+						$uploadData = $this->upload->data();
+						// resize image
+						$query['path'] = $uploadData['full_path'];
+						$query['width'] = 1000;
+						$query['height'] = 600;
+						$this->resizeImage($query);
+						// update offer info
+						$imageData = array(
+							'offer_image' => $file_name,
+							'offer_image_thumb' => $thumb_file_name,
+						);
+						$this->db->where('offer_id',$offer_id);
+						$this->db->update('offers',$imageData);
+						$jsonData['success'] = true;
+					}
+				}else {
+					$jsonData['success'] = true;
+				}
 			}
 		} else {
 			foreach ($_POST as $key => $value) {
@@ -249,6 +378,7 @@ class Offer extends CI_Controller {
 		$perpage = 10;
 		// take search parameters
 		$query['search'] = $this->input->get('search');
+		$query['from'] = 'admin';
 		$query['offer_creator'] = $this->session->userdata('user_id');
 
 		// response object
@@ -308,3 +438,5 @@ class Offer extends CI_Controller {
 		echo json_encode($jsonData);
 	}
 }
+
+

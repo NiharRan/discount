@@ -166,7 +166,9 @@ class Restaurant extends CI_Controller {
 				if(isset($_FILES['restaurant_banner']['name']) && $_FILES['restaurant_banner']['name'] != ''){
 					$folder = 'restaurant-'.$restaurant_id;
 					$ext = pathinfo($_FILES['restaurant_banner']['name'], PATHINFO_EXTENSION);
-					$file_name = 'banner-'.time().'.'.$ext;
+					$time = time();
+					$file_name = 'banner-'.$time.'.'.$ext;
+					$thumb_file_name = 'banner-'.$time.'_thumb.'.$ext;
 
 					$_FILES['restaurant_banner']['name']=$file_name;
 					$path = './uploads/restaurant/'.$folder;
@@ -192,6 +194,7 @@ class Restaurant extends CI_Controller {
 						// update restaurant info
 						$imageData = array(
 							'restaurant_banner' => $file_name,
+							'restaurant_banner_thumb' => $thumb_file_name,
 						);
 						$this->db->where('restaurant_id',$restaurant_id);
 						$this->db->update('restaurants',$imageData);
@@ -202,7 +205,9 @@ class Restaurant extends CI_Controller {
 				if(isset($_FILES['restaurant_logo']['name']) && $_FILES['restaurant_logo']['name'] != ''){
 					$folder = 'restaurant-'.$restaurant_id;
 					$ext = pathinfo($_FILES['restaurant_logo']['name'], PATHINFO_EXTENSION);
-					$file_name = 'logo-'.time().'.'.$ext;
+					$time = time();
+					$file_name = 'logo-'.$time.'.'.$ext;
+					$thumb_file_name = 'logo-'.$time.'_thumb.'.$ext;
 
 					$_FILES['restaurant_logo']['name']=$file_name;
 					$path = './uploads/restaurant/'.$folder;
@@ -228,6 +233,7 @@ class Restaurant extends CI_Controller {
 						// update restaurant info
 						$imageData = array(
 							'restaurant_logo' => $file_name,
+							'restaurant_logo_thumb' => $thumb_file_name,
 						);
 						$this->db->where('restaurant_id',$restaurant_id);
 						$this->db->update('restaurants',$imageData);
@@ -386,7 +392,9 @@ class Restaurant extends CI_Controller {
 			if(isset($_FILES['restaurant_new_banner']['name']) && $_FILES['restaurant_new_banner']['name'] != ''){
 				$folder = 'restaurant-'.$restaurant_id;
 				$ext = pathinfo($_FILES['restaurant_new_banner']['name'], PATHINFO_EXTENSION);
-				$file_name = 'banner-'.time().'.'.$ext;
+				$time = time();
+				$file_name = 'banner-'.$time.'.'.$ext;
+				$thumb_file_name = 'banner-'.$time.'_thumb.'.$ext;
 
 				$_FILES['restaurant_new_banner']['name']=$file_name;
 				$path = './uploads/restaurant/'.$folder;
@@ -430,6 +438,7 @@ class Restaurant extends CI_Controller {
 					// update restaurant info
 					$imageData = array(
 						'restaurant_banner' => $file_name,
+						'restaurant_banner_thumb' => $thumb_file_name,
 					);
 					$this->db->where('restaurant_id',$restaurant_id);
 					$this->db->update('restaurants',$imageData);
@@ -440,7 +449,9 @@ class Restaurant extends CI_Controller {
 			if(isset($_FILES['restaurant_new_logo']['name']) && $_FILES['restaurant_new_logo']['name'] != ''){
 				$folder = 'restaurant-'.$restaurant_id;
 				$ext = pathinfo($_FILES['restaurant_new_logo']['name'], PATHINFO_EXTENSION);
-				$file_name = 'logo-'.time().'.'.$ext;
+				$time = time();
+				$file_name = 'logo-'.$time.'.'.$ext;
+				$thumb_file_name = 'logo-'.$time.'_thumb.'.$ext;
 
 				$_FILES['restaurant_new_logo']['name']=$file_name;
 				$path = './uploads/restaurant/'.$folder;
@@ -484,6 +495,7 @@ class Restaurant extends CI_Controller {
 					// update restaurant info
 					$imageData = array(
 						'restaurant_logo' => $file_name,
+						'restaurant_logo_thumb' => $thumb_file_name,
 					);
 					$this->db->where('restaurant_id',$restaurant_id);
 					$this->db->update('restaurants',$imageData);
@@ -518,51 +530,6 @@ class Restaurant extends CI_Controller {
 		
 		// send the response to client
 		echo json_encode($jsonData);
-	}
-
-	/**
-	 * this is a helper function
-	 * to resize image 
-	 */
-	function resize($width, $height,$path)
-	{
-		/* Get original image x y*/
-		list($w, $h) = getimagesize($path);
-		/* calculate new image size with ratio */
-		$ratio = max($width/$w, $height/$h);
-		$h = ceil($height / $ratio);
-		$x = ($w - $width / $ratio) / 2;
-		$w = ceil($width / $ratio);
-
-		$imgString = file_get_contents($path);
-		/* create image from string */
-		$image = imagecreatefromstring($imgString);
-		$tmp = imagecreatetruecolor($width, $height);
-		imagecopyresampled($tmp, $image,
-		0, 0,
-		$x, 0,
-		$width, $height,
-		$w, $h);
-		/* Save image */
-		switch ($_FILES['user_avatar']['type']) 
-		{
-		case 'image/jpeg':
-			imagejpeg($tmp, $path, 100);
-			break;
-		case 'image/png':
-			imagepng($tmp, $path, 0);
-			break;
-		case 'image/gif':
-			imagegif($tmp, $path);
-			break;
-		default:
-			exit;
-			break;
-		}
-		return $path;
-		/* cleanup memory */
-		imagedestroy($image);
-		imagedestroy($tmp);
 	}
 
 	/**
